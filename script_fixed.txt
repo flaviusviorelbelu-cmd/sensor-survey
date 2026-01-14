@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Sensor Survey v5.1 - Fixed for SharePoint</title>
+    <style>
+        :root {
+            --color-primary: #2180A3;
+            --color-primary-hover: #1D6E80;
+            --color-success: #32B8C6;
+            --color-error: #C0152F;
+            --color-warning: #A84B2F;
+            --color-bg: #FCFCF9;
+            --color-surface: #FFFFFF;
+            --color-text: #134252;
+            --color-text-secondary: #628076;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-shadow: rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+            --spacing: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing);
+        }
+
+        header {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--spacing) 0;
+            margin-bottom: var(--spacing);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--color-primary);
+        }
+
+        .header-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing);
+            margin-bottom: var(--spacing);
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: var(--spacing);
+            text-align: center;
+            box-shadow: 0 2px 4px var(--color-shadow);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin: 8px 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: var(--spacing);
+            margin-bottom: var(--spacing);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        .search-box input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 150ms ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            box-shadow: 0 4px 8px rgba(33, 128, 141, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing);
+            margin-bottom: var(--spacing);
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: var(--spacing);
+            box-shadow: 0 2px 4px var(--color-shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing);
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 12px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--color-primary);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: var(--spacing);
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 150ms ease;
+            color: var(--color-text);
+        }
+
+        .filter-btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--color-primary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--color-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+        }
+
+        thead {
+            background: rgba(33, 128, 141, 0.08);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: rgba(33, 128, 141, 0.12);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 13px;
+        }
+
+        tbody tr {
+            transition: background 150ms ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(33, 128, 141, 0.04);
+            cursor: pointer;
+        }
+
+        tbody tr.selected {
+            background: rgba(33, 128, 141, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-operational {
+            background: rgba(50, 184, 198, 0.2);
+            color: var(--color-success);
+        }
+
+        .badge-testing {
+            background: rgba(230, 129, 97, 0.2);
+            color: var(--color-warning);
+        }
+
+        .badge-decommissioned {
+            background: rgba(192, 21, 47, 0.2);
+            color: var(--color-error);
+        }
+
+        .detail-view {
+            display: grid;
+            gap: 12px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 12px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: var(--color-text);
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .sensors-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-top: 6px;
+        }
+
+        .sensor-tag {
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            padding: var(--spacing);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing);
+            padding-bottom: var(--spacing);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--color-primary);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: var(--spacing);
+            color: var(--color-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .modal-close:hover {
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 13px;
+        }
+
+        .form-group.required label::after {
+            content: ' *';
+            color: var(--color-error);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--color-text);
+            background: var(--color-surface);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+        }
+
+        .form-group input.error,
+        .form-group textarea.error,
+        .form-group select.error {
+            border-color: var(--color-error);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--spacing);
+        }
+
+        .form-actions button {
+            flex: 1;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: var(--spacing);
+            padding-top: var(--spacing);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px var(--spacing);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(33, 128, 141, 0.2);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: var(--spacing);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 300ms ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(50, 184, 198, 0.1);
+            color: var(--color-success);
+            border: 1px solid rgba(50, 184, 198, 0.3);
+        }
+
+        .alert-error {
+            background: rgba(192, 21, 47, 0.1);
+            color: var(--color-error);
+            border: 1px solid rgba(192, 21, 47, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--color-border);
+            margin-bottom: var(--spacing);
+            gap: 4px;
+        }
+
+        .tab-btn {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 150ms ease;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .validation-error {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🛰️ Satellite Sensor Survey v5.1</h1>
+            <p class="header-subtitle">Real-time satellite and sensor management dashboard</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Satellites</div>
+                <div class="stat-value" id="statSatellites">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Sensors</div>
+                <div class="stat-value" id="statSensors">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Operational</div>
+                <div class="stat-value" id="statOperational">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Constellations</div>
+                <div class="stat-value" id="statConstellations">0</div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search satellites, sensors, or NORAD IDs...">
+            </div>
+            <button class="btn btn-primary" onclick="showAddSatelliteModal()">+ Add Satellite</button>
+            <button class="btn btn-secondary" onclick="exportToCSV()">📥 Export</button>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Satellites Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Satellites</h2>
+                    <span id="satelliteCount">0</span>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('satellites', 'sat-all')">All</button>
+                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-operational')">Operational</button>
+                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-leo')">LEO</button>
+                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-geo')">GEO</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="satelliteTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('satellites', 'Title')">Name ↕</th>
+                                <th onclick="sortTable('satellites', 'NORAD_ID')">NORAD ID ↕</th>
+                                <th>Status</th>
+                                <th>Orbit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="satelliteTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999;">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sensors Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Sensors</h2>
+                    <span id="sensorCount">0</span>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('sensors', 'sen-all')">All</button>
+                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-eo')">EO</button>
+                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-ir')">IR</button>
+                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-sar')">SAR</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="sensorTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('sensors', 'Title')">Name ↕</th>
+                                <th>Type</th>
+                                <th>Satellites</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sensorTableBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #999;">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 id="detailTitle">Satellite Details</h2>
+                <div id="detailActions"></div>
+            </div>
+            <div id="detailContent" class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>Select a satellite or sensor to view details</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="addSatelliteModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add New Satellite</h2>
+            
+            <form id="satelliteForm" onsubmit="saveSatellite(event)">
+                <div class="form-group required">
+                    <label for="satellite-title">Satellite Name</label>
+                    <input 
+                        type="text" 
+                        id="satellite-title"
+                        name="Title" 
+                        placeholder="Enter satellite name"
+                        data-required="true"
+                    >
+                    <div class="validation-error" id="error-title"></div>
+                </div>
+
+                <div class="form-group required">
+                    <label for="satellite-norad">NORAD ID</label>
+                    <input 
+                        type="number" 
+                        id="satellite-norad"
+                        name="NORAD_ID" 
+                        placeholder="Enter NORAD ID"
+                        data-required="true"
+                    >
+                    <div class="validation-error" id="error-norad"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-cospar">COSPAR ID</label>
+                    <input 
+                        type="text" 
+                        id="satellite-cospar"
+                        name="COSPAR_ID" 
+                        placeholder="e.g., 2013-008A"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-mission">Mission Type</label>
+                    <input 
+                        type="text" 
+                        id="satellite-mission"
+                        name="Mission_Type" 
+                        placeholder="e.g., Earth Observation"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-status">Status</label>
+                    <select id="satellite-status" name="Status">
+                        <option value="Operational">Operational</option>
+                        <option value="Non-operational">Non-operational</option>
+                        <option value="Partially operational">Partially operational</option>
+                        <option value="Unknown">Unknown</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-orbit">Orbit Type</label>
+                    <select id="satellite-orbit" name="Orbit_Type">
+                        <option value="">-- Select --</option>
+                        <option value="LEO">LEO</option>
+                        <option value="MEO">MEO</option>
+                        <option value="GEO">GEO</option>
+                        <option value="SSO">SSO</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-launch">Launch Date</label>
+                    <input 
+                        type="date" 
+                        id="satellite-launch"
+                        name="Launch_Date"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="satellite-sensors">Sensor Names</label>
+                    <textarea 
+                        id="satellite-sensors"
+                        name="Sensor_Names" 
+                        rows="3"
+                        placeholder="Comma-separated sensor names"
+                    ></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Satellite</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddSatelliteModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // SATELLITE SENSOR SURVEY v5.1 - FIXED FOR SHAREPOINT
+        // ============================================================================
+
+        // Configuration with better SharePoint detection
+        const config = {
+            satelliteList: 'Satellite_Fixed',
+            sensorList: 'Sensor',
+            useMultiSelectChoice: false,
+            inSharePoint: typeof _spPageContextInfo !== 'undefined' && 
+                         _spPageContextInfo && 
+                         _spPageContextInfo.webAbsoluteUrl ? true : false,
+            siteUrl: typeof _spPageContextInfo !== 'undefined' && 
+                    _spPageContextInfo && 
+                    _spPageContextInfo.webAbsoluteUrl ? _spPageContextInfo.webAbsoluteUrl : ''
+        };
+
+        // State Management
+        const state = {
+            satellites: [],
+            sensors: [],
+            filteredSatellites: [],
+            filteredSensors: [],
+            selectedSatellite: null,
+            selectedSensor: null,
+            searchTerm: '',
+            sortColumn: 'Title',
+            sortDirection: 'asc',
+            currentFilter: 'all',
+            editingId: null
+        };
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing Satellite Sensor Survey v5.1...');
+            console.log('SharePoint Context:', config.inSharePoint ? 'Detected' : 'Not Detected');
+            console.log('Site URL:', config.siteUrl);
+
+            // Load data
+            await loadSatellites();
+            await loadSensors();
+
+            // Set up event listeners
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    state.searchTerm = e.target.value.toLowerCase();
+                    filterAndDisplayData();
+                });
+            }
+
+            // Initial render
+            filterAndDisplayData();
+            updateStatistics();
+        });
+
+        // ============================================================================
+        // DATA LOADING - SHAREPOINT REST API (FIXED VERSION)
+        // ============================================================================
+
+        async function loadSatellites() {
+            try {
+                if (config.inSharePoint && config.siteUrl) {
+                    const url = config.siteUrl + 
+                        `/_api/web/lists/getbytitle('${config.satelliteList}')/items?` +
+                        `$select=ID,Title,NORAD_ID,COSPAR_ID,Mission_Type,Status,Orbit_Type,` +
+                        `Launch_Date,Expected_Lifetime,Constellation_ID,Sensor_Names,Primary_Sensor&` +
+                        `$top=5000`;
+
+                    console.log('Fetching satellites from SharePoint...');
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json;odata=verbose'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        state.satellites = data.d.results.map(item => ({
+                            ID: item.ID,
+                            Title: item.Title || '',
+                            NORAD_ID: item.NORAD_ID || '',
+                            COSPAR_ID: item.COSPAR_ID || '',
+                            Mission_Type: item.Mission_Type || '',
+                            Status: item.Status || 'Operational',
+                            Orbit_Type: item.Orbit_Type || '',
+                            Launch_Date: item.Launch_Date ? new Date(item.Launch_Date).toISOString().split('T')[0] : '',
+                            Expected_Lifetime: item.Expected_Lifetime || '',
+                            Constellation_ID: item.Constellation_ID || '',
+                            Sensor_Names: item.Sensor_Names || '',
+                            Primary_Sensor: item.Primary_Sensor || ''
+                        }));
+                        showAlert('✅ Satellites loaded from SharePoint', 'success');
+                        console.log('Loaded ' + state.satellites.length + ' satellites');
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } else {
+                    // Sample data fallback
+                    state.satellites = [
+                        { ID: 1, Title: 'Landsat 8', NORAD_ID: 39084, COSPAR_ID: '2013-008A', Mission_Type: 'Earth Observation', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2013-02-11', Expected_Lifetime: 10, Constellation_ID: 1, Sensor_Names: 'Multispectral Imager,Optical Imager', Primary_Sensor: 'Multispectral Imager' },
+                        { ID: 2, Title: 'Sentinel-1A', NORAD_ID: 39953, COSPAR_ID: '2014-016A', Mission_Type: 'Earth Observation', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2014-04-03', Expected_Lifetime: 7, Constellation_ID: 2, Sensor_Names: 'SAR-X', Primary_Sensor: 'SAR-X' },
+                        { ID: 3, Title: 'Sentinel-2A', NORAD_ID: 40697, COSPAR_ID: '2015-028A', Mission_Type: 'Earth Observation', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2015-06-23', Expected_Lifetime: 7.25, Constellation_ID: 2, Sensor_Names: 'Multispectral Imager,Optical Imager', Primary_Sensor: 'Multispectral Imager' },
+                        { ID: 4, Title: 'NOAA-18', NORAD_ID: 28654, COSPAR_ID: '2005-018A', Mission_Type: 'METOC', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2005-05-20', Expected_Lifetime: 14, Constellation_ID: 3, Sensor_Names: 'Radiometer,Thermal IR Camera', Primary_Sensor: 'Radiometer' }
+                    ];
+                    showAlert('📊 Using sample satellite data', 'success');
+                }
+            } catch (error) {
+                console.error('Error loading satellites:', error);
+                showAlert('Error loading satellites: ' + error.message, 'error');
+                // Load sample data on error
+                state.satellites = [
+                    { ID: 1, Title: 'Landsat 8', NORAD_ID: 39084, COSPAR_ID: '2013-008A', Mission_Type: 'Earth Observation', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2013-02-11', Expected_Lifetime: 10, Constellation_ID: 1, Sensor_Names: 'Multispectral Imager', Primary_Sensor: 'Multispectral Imager' }
+                ];
+            }
+        }
+
+        async function loadSensors() {
+            try {
+                if (config.inSharePoint && config.siteUrl) {
+                    const url = config.siteUrl + 
+                        `/_api/web/lists/getbytitle('${config.sensorList}')/items?` +
+                        `$select=ID,Title,Sensor_Type,Description,N_of_Bands,` +
+                        `Resolution_Min_m,Resolution_Max_m,Swath_Min_km,Swath_Max_km,Satellite_Names&` +
+                        `$top=5000`;
+
+                    console.log('Fetching sensors from SharePoint...');
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json;odata=verbose'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        state.sensors = data.d.results.map(item => ({
+                            ID: item.ID,
+                            Title: item.Title || '',
+                            Sensor_Type: item.Sensor_Type || '',
+                            Description: item.Description || '',
+                            N_of_Bands: item.N_of_Bands || '',
+                            Resolution_Min_m: item.Resolution_Min_m || '',
+                            Resolution_Max_m: item.Resolution_Max_m || '',
+                            Swath_Min_km: item.Swath_Min_km || '',
+                            Swath_Max_km: item.Swath_Max_km || '',
+                            Satellite_Names: item.Satellite_Names || ''
+                        }));
+                        showAlert('✅ Sensors loaded from SharePoint', 'success');
+                        console.log('Loaded ' + state.sensors.length + ' sensors');
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } else {
+                    // Sample data fallback
+                    state.sensors = [
+                        { ID: 1, Title: 'VIIRS', Sensor_Type: 'Multispectral', Description: 'Visible Infrared Imaging Radiometer Suite', N_of_Bands: 22, Resolution_Min_m: 375, Resolution_Max_m: 750, Swath_Min_km: 3000, Swath_Max_km: 3000, Satellite_Names: 'Landsat 8' },
+                        { ID: 2, Title: 'SAR-X', Sensor_Type: 'SAR', Description: 'Synthetic Aperture Radar X-band', N_of_Bands: 1, Resolution_Min_m: 3, Resolution_Max_m: 10, Swath_Min_km: 100, Swath_Max_km: 300, Satellite_Names: 'Sentinel-1A' }
+                    ];
+                    showAlert('📊 Using sample sensor data', 'success');
+                }
+            } catch (error) {
+                console.error('Error loading sensors:', error);
+                showAlert('Error loading sensors: ' + error.message, 'error');
+                // Load sample data on error
+                state.sensors = [
+                    { ID: 1, Title: 'VIIRS', Sensor_Type: 'Multispectral', Description: 'Visible Infrared Imaging Radiometer Suite', N_of_Bands: 22, Resolution_Min_m: 375, Resolution_Max_m: 750, Swath_Min_km: 3000, Swath_Max_km: 3000, Satellite_Names: 'Landsat 8' }
+                ];
+            }
+        }
+
+        // ============================================================================
+        // DATA FILTERING AND DISPLAY
+        // ============================================================================
+
+        function filterAndDisplayData() {
+            // Filter satellites
+            state.filteredSatellites = state.satellites.filter(sat => {
+                const matchesSearch = !state.searchTerm ||
+                    sat.Title.toLowerCase().includes(state.searchTerm) ||
+                    (sat.NORAD_ID && sat.NORAD_ID.toString().includes(state.searchTerm)) ||
+                    (sat.Mission_Type && sat.Mission_Type.toLowerCase().includes(state.searchTerm));
+
+                if (state.currentFilter === 'sat-operational') {
+                    return matchesSearch && sat.Status === 'Operational';
+                } else if (state.currentFilter === 'sat-leo') {
+                    return matchesSearch && sat.Orbit_Type === 'LEO';
+                } else if (state.currentFilter === 'sat-geo') {
+                    return matchesSearch && sat.Orbit_Type === 'GEO';
+                }
+
+                return matchesSearch;
+            });
+
+            // Filter sensors
+            state.filteredSensors = state.sensors.filter(sen => {
+                const matchesSearch = !state.searchTerm ||
+                    sen.Title.toLowerCase().includes(state.searchTerm) ||
+                    (sen.Sensor_Type && sen.Sensor_Type.toLowerCase().includes(state.searchTerm));
+
+                if (state.currentFilter === 'sen-eo') {
+                    return matchesSearch && sen.Sensor_Type === 'EO';
+                } else if (state.currentFilter === 'sen-ir') {
+                    return matchesSearch && sen.Sensor_Type === 'IR';
+                } else if (state.currentFilter === 'sen-sar') {
+                    return matchesSearch && sen.Sensor_Type === 'SAR';
+                }
+
+                return matchesSearch;
+            });
+
+            // Sort
+            state.filteredSatellites.sort((a, b) => {
+                let aVal = a[state.sortColumn] || '';
+                let bVal = b[state.sortColumn] || '';
+                const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                return state.sortDirection === 'asc' ? comparison : -comparison;
+            });
+
+            state.filteredSensors.sort((a, b) => {
+                let aVal = a[state.sortColumn] || '';
+                let bVal = b[state.sortColumn] || '';
+                const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                return state.sortDirection === 'asc' ? comparison : -comparison;
+            });
+
+            renderSatelliteTable();
+            renderSensorTable();
+
+            const satelliteCountEl = document.getElementById('satelliteCount');
+            const sensorCountEl = document.getElementById('sensorCount');
+            if (satelliteCountEl) satelliteCountEl.textContent = state.filteredSatellites.length;
+            if (sensorCountEl) sensorCountEl.textContent = state.filteredSensors.length;
+        }
+
+        function renderSatelliteTable() {
+            const tbody = document.getElementById('satelliteTableBody');
+            if (!tbody) return;
+            
+            if (state.filteredSatellites.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No satellites found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = state.filteredSatellites.map(sat => `
+                <tr onclick="selectSatellite(${sat.ID})" class="${state.selectedSatellite?.ID === sat.ID ? 'selected' : ''}">
+                    <td><strong>${sat.Title}</strong></td>
+                    <td>${sat.NORAD_ID}</td>
+                    <td><span class="badge badge-${sat.Status.toLowerCase().replace('-', '')}">${sat.Status}</span></td>
+                    <td>${sat.Orbit_Type}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSensorTable() {
+            const tbody = document.getElementById('sensorTableBody');
+            if (!tbody) return;
+            
+            if (state.filteredSensors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No sensors found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = state.filteredSensors.map(sen => `
+                <tr onclick="selectSensor(${sen.ID})" class="${state.selectedSensor?.ID === sen.ID ? 'selected' : ''}">
+                    <td><strong>${sen.Title}</strong></td>
+                    <td>${sen.Sensor_Type}</td>
+                    <td>${(sen.Satellite_Names || '').split(',').filter(s => s.trim()).length}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================================
+        // DETAIL VIEWS
+        // ============================================================================
+
+        function selectSatellite(id) {
+            const sat = state.satellites.find(s => s.ID === id);
+            if (!sat) return;
+
+            state.selectedSatellite = sat;
+            state.selectedSensor = null;
+
+            renderSatelliteDetail();
+            filterAndDisplayData();
+        }
+
+        function selectSensor(id) {
+            const sen = state.sensors.find(s => s.ID === id);
+            if (!sen) return;
+
+            state.selectedSensor = sen;
+            state.selectedSatellite = null;
+
+            renderSensorDetail();
+            filterAndDisplayData();
+        }
+
+        function renderSatelliteDetail() {
+            const sat = state.selectedSatellite;
+            const sensors = (sat.Sensor_Names || '').split(',').map(s => s.trim()).filter(s => s);
+
+            let html = `
+                <div class="detail-view">
+                    <div class="detail-row">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${sat.Title}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">NORAD ID</div>
+                        <div class="detail-value">${sat.NORAD_ID}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">COSPAR ID</div>
+                        <div class="detail-value">${sat.COSPAR_ID || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value"><span class="badge badge-${sat.Status.toLowerCase().replace('-', '')}">${sat.Status}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Mission Type</div>
+                        <div class="detail-value">${sat.Mission_Type || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Orbit Type</div>
+                        <div class="detail-value">${sat.Orbit_Type || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Launch Date</div>
+                        <div class="detail-value">${sat.Launch_Date || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Constellation</div>
+                        <div class="detail-value">C-${sat.Constellation_ID}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Sensors</div>
+                        <div class="detail-value">
+                            <div class="sensors-list">
+                                ${sensors.length > 0 ? sensors.map(s => `<span class="sensor-tag">${s}</span>`).join('') : '<span style="color: #999;">None assigned</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const detailTitle = document.getElementById('detailTitle');
+            const detailContent = document.getElementById('detailContent');
+            const detailActions = document.getElementById('detailActions');
+
+            if (detailTitle) detailTitle.textContent = `Satellite: ${sat.Title}`;
+            if (detailContent) detailContent.innerHTML = html;
+            if (detailActions) detailActions.innerHTML = `
+                <button class="btn btn-small btn-secondary" onclick="editSatellite(${sat.ID})">Edit</button>
+                <button class="btn btn-small btn-secondary" onclick="deleteSatellite(${sat.ID})">Delete</button>
+            `;
+        }
+
+        function renderSensorDetail() {
+            const sen = state.selectedSensor;
+            const satellites = (sen.Satellite_Names || '').split(',').map(s => s.trim()).filter(s => s);
+
+            let html = `
+                <div class="detail-view">
+                    <div class="detail-row">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${sen.Title}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Type</div>
+                        <div class="detail-value">${sen.Sensor_Type || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">${sen.Description || 'N/A'}</div>
+                    </div>
+                    ${sen.N_of_Bands ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Bands</div>
+                        <div class="detail-value">${sen.N_of_Bands}</div>
+                    </div>
+                    ` : ''}
+                    ${sen.Resolution_Min_m ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Resolution</div>
+                        <div class="detail-value">${sen.Resolution_Min_m} - ${sen.Resolution_Max_m} m</div>
+                    </div>
+                    ` : ''}
+                    ${sen.Swath_Min_km ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Swath</div>
+                        <div class="detail-value">${sen.Swath_Min_km} - ${sen.Swath_Max_km} km</div>
+                    </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <div class="detail-label">Satellites</div>
+                        <div class="detail-value">
+                            <div class="sensors-list">
+                                ${satellites.length > 0 ? satellites.map(s => `<span class="sensor-tag">${s}</span>`).join('') : '<span style="color: #999;">None assigned</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const detailTitle = document.getElementById('detailTitle');
+            const detailContent = document.getElementById('detailContent');
+            const detailActions = document.getElementById('detailActions');
+
+            if (detailTitle) detailTitle.textContent = `Sensor: ${sen.Title}`;
+            if (detailContent) detailContent.innerHTML = html;
+            if (detailActions) detailActions.innerHTML = '';
+        }
+
+        // ============================================================================
+        // CRUD OPERATIONS - WITH MANUAL VALIDATION
+        // ============================================================================
+
+        function showAddSatelliteModal() {
+            clearValidationErrors();
+            const form = document.getElementById('satelliteForm');
+            if (form) form.reset();
+            
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) modalTitle.textContent = 'Add New Satellite';
+            
+            state.editingId = null;
+            
+            const modal = document.getElementById('addSatelliteModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeAddSatelliteModal() {
+            const modal = document.getElementById('addSatelliteModal');
+            if (modal) modal.classList.remove('active');
+            
+            const form = document.getElementById('satelliteForm');
+            if (form) form.reset();
+            
+            clearValidationErrors();
+            
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) modalTitle.textContent = 'Add New Satellite';
+            
+            state.editingId = null;
+        }
+
+        function clearValidationErrors() {
+            const errorElements = document.querySelectorAll('.validation-error');
+            errorElements.forEach(el => el.textContent = '');
+            
+            const inputs = document.querySelectorAll('.form-group input, .form-group textarea, .form-group select');
+            inputs.forEach(input => input.classList.remove('error'));
+        }
+
+        async function saveSatellite(event) {
+            event.preventDefault();
+            clearValidationErrors();
+
+            const titleInput = document.getElementById('satellite-title');
+            const noradInput = document.getElementById('satellite-norad');
+
+            let isValid = true;
+
+            // Manual validation
+            if (!titleInput || !titleInput.value.trim()) {
+                showValidationError('title', 'Satellite Name is required');
+                isValid = false;
+            }
+
+            if (!noradInput || !noradInput.value || isNaN(parseInt(noradInput.value))) {
+                showValidationError('norad', 'NORAD ID is required and must be a number');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showAlert('❌ Please fix validation errors', 'error');
+                return;
+            }
+
+            if (!config.inSharePoint || !config.siteUrl) {
+                showAlert('⚠️ Save requires SharePoint context and a configured site URL', 'error');
+                return;
+            }
+
+            try {
+                console.log('Attempting to save satellite...');
+
+                const form = document.getElementById('satelliteForm');
+                const formData = new FormData(form);
+
+                const payload = {
+                    '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
+                    'Title': formData.get('Title').trim(),
+                    'NORAD_ID': parseInt(formData.get('NORAD_ID')),
+                    'COSPAR_ID': formData.get('COSPAR_ID') ? formData.get('COSPAR_ID').trim() : '',
+                    'Mission_Type': formData.get('Mission_Type') ? formData.get('Mission_Type').trim() : '',
+                    'Status': formData.get('Status') || 'Operational',
+                    'Orbit_Type': formData.get('Orbit_Type') || '',
+                    'Launch_Date': formData.get('Launch_Date') ? new Date(formData.get('Launch_Date')).toISOString() : null,
+                    'Sensor_Names': formData.get('Sensor_Names') ? formData.get('Sensor_Names').trim() : ''
+                };
+
+                // Get request digest
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include'
+                });
+
+                if (!digestResponse.ok) {
+                    throw new Error(`Digest request failed: ${digestResponse.status}`);
+                }
+
+                const digestData = await digestResponse.json();
+                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+                let url, method, headers;
+
+                if (state.editingId) {
+                    // UPDATE
+                    url = config.siteUrl + 
+                        `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${state.editingId})`;
+                    method = 'POST';
+                    headers = {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': digest,
+                        'X-HTTP-Method': 'MERGE',
+                        'IF-MATCH': '*'
+                    };
+                } else {
+                    // CREATE
+                    url = config.siteUrl + 
+                        `/_api/web/lists/getbytitle('${config.satelliteList}')/items`;
+                    method = 'POST';
+                    headers = {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': digest
+                    };
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: headers,
+                    body: JSON.stringify(payload),
+                    credentials: 'include'
+                });
+
+                if (response.ok || response.status === 201 || response.status === 204) {
+                    const action = state.editingId ? 'updated' : 'added';
+                    showAlert(`✅ Satellite ${action} successfully!`, 'success');
+                    
+                    closeAddSatelliteModal();
+                    state.editingId = null;
+                    
+                    await loadSatellites();
+                    filterAndDisplayData();
+                    updateStatistics();
+                } else {
+                    const errorText = await response.text();
+                    console.error('API error:', errorText);
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error saving satellite:', error);
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function showValidationError(fieldName, message) {
+            const errorEl = document.getElementById(`error-${fieldName}`);
+            const inputEl = document.getElementById(`satellite-${fieldName}`);
+            
+            if (errorEl) errorEl.textContent = message;
+            if (inputEl) inputEl.classList.add('error');
+        }
+
+        async function deleteSatellite(id) {
+            if (!confirm('Are you sure you want to delete this satellite?')) return;
+
+            if (!config.inSharePoint || !config.siteUrl) {
+                showAlert('Delete requires SharePoint context', 'error');
+                return;
+            }
+
+            try {
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include'
+                });
+
+                if (!digestResponse.ok) {
+                    throw new Error('Failed to get request digest');
+                }
+
+                const digestData = await digestResponse.json();
+                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+                const url = config.siteUrl + 
+                    `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${id})`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-RequestDigest': digest,
+                        'X-HTTP-Method': 'DELETE',
+                        'IF-MATCH': '*',
+                        'Accept': 'application/json;odata=verbose'
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok || response.status === 204) {
+                    showAlert('✅ Satellite deleted successfully', 'success');
+                    state.selectedSatellite = null;
+                    
+                    await loadSatellites();
+                    filterAndDisplayData();
+                    updateStatistics();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error deleting satellite:', error);
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================================
+        // UTILITY FUNCTIONS
+        // ============================================================================
+
+        function updateStatistics() {
+            const operational = state.satellites.filter(s => s.Status === 'Operational').length;
+            const constellations = new Set(state.satellites.map(s => s.Constellation_ID)).size;
+
+            const statSatellites = document.getElementById('statSatellites');
+            const statSensors = document.getElementById('statSensors');
+            const statOperational = document.getElementById('statOperational');
+            const statConstellations = document.getElementById('statConstellations');
+
+            if (statSatellites) statSatellites.textContent = state.satellites.length;
+            if (statSensors) statSensors.textContent = state.sensors.length;
+            if (statOperational) statOperational.textContent = operational;
+            if (statConstellations) statConstellations.textContent = constellations;
+        }
+
+        function sortTable(type, column) {
+            if (state.sortColumn === column) {
+                state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortColumn = column;
+                state.sortDirection = 'asc';
+            }
+            filterAndDisplayData();
+        }
+
+        function switchTab(panelType, tab) {
+            state.currentFilter = tab;
+            
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            
+            filterAndDisplayData();
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `<span>${message}</span>`;
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+
+        function exportToCSV() {
+            const data = state.filteredSatellites.map(sat => ({
+                'Name': sat.Title,
+                'NORAD ID': sat.NORAD_ID,
+                'Status': sat.Status,
+                'Orbit': sat.Orbit_Type,
+                'Mission Type': sat.Mission_Type,
+                'Sensors': sat.Sensor_Names
+            }));
+
+            if (data.length === 0) {
+                showAlert('No data to export', 'error');
+                return;
+            }
+
+            const csv = [
+                Object.keys(data[0]).join(','),
+                ...data.map(row => Object.values(row).map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'satellites.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function editSatellite(id) {
+            const sat = state.satellites.find(s => s.ID === id);
+            if (!sat) return;
+
+            state.editingId = id;
+
+            const form = document.getElementById('satelliteForm');
+            if (!form) return;
+
+            form.Title.value = sat.Title || '';
+            form.NORAD_ID.value = sat.NORAD_ID || '';
+            form.COSPAR_ID.value = sat.COSPAR_ID || '';
+            form.Mission_Type.value = sat.Mission_Type || '';
+            form.Status.value = sat.Status || 'Operational';
+            form.Orbit_Type.value = sat.Orbit_Type || '';
+            form.Launch_Date.value = sat.Launch_Date || '';
+            form.Sensor_Names.value = sat.Sensor_Names || '';
+
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) modalTitle.textContent = `Edit Satellite: ${sat.Title}`;
+
+            showAddSatelliteModal();
+        }
+    </script>
+</body>
+</html>
