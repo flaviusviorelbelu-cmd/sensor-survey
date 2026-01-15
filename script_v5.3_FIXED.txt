@@ -663,9 +663,9 @@
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search satellites, sensors, or NORAD IDs...">
             </div>
-            <button class="btn btn-primary" onclick="showAddSatelliteModal()">+ Add Satellite</button>
-            <button class="btn btn-secondary" onclick="showImportModal()">📤 Import CSV</button>
-            <button class="btn btn-secondary" onclick="exportToCSV()">📥 Export</button>
+            <button type="button" class="btn btn-primary" onclick="showAddSatelliteModal()">+ Add Satellite</button>
+            <button type="button" class="btn btn-secondary" onclick="showImportModal()">📤 Import CSV</button>
+            <button type="button" class="btn btn-secondary" onclick="exportToCSV()">📥 Export</button>
         </div>
 
         <!-- Main Content Grid -->
@@ -678,10 +678,10 @@
                 </div>
 
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('satellites', 'sat-all')">All</button>
-                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-operational')">Operational</button>
-                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-leo')">LEO</button>
-                    <button class="tab-btn" onclick="switchTab('satellites', 'sat-geo')">GEO</button>
+                    <button type="button" class="tab-btn active" onclick="switchTab('satellites', 'sat-all')">All</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('satellites', 'sat-operational')">Operational</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('satellites', 'sat-leo')">LEO</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('satellites', 'sat-geo')">GEO</button>
                 </div>
 
                 <div class="table-wrapper">
@@ -713,10 +713,10 @@
                 </div>
 
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('sensors', 'sen-all')">All</button>
-                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-eo')">EO</button>
-                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-ir')">IR</button>
-                    <button class="tab-btn" onclick="switchTab('sensors', 'sen-sar')">SAR</button>
+                    <button type="button" class="tab-btn active" onclick="switchTab('sensors', 'sen-all')">All</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('sensors', 'sen-eo')">EO</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('sensors', 'sen-ir')">IR</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('sensors', 'sen-sar')">SAR</button>
                 </div>
 
                 <div class="table-wrapper">
@@ -758,10 +758,10 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Satellite</h3>
-                <button class="modal-close" type="button" onclick="closeAddSatelliteModal()">×</button>
+                <button type="button" class="modal-close" onclick="closeAddSatelliteModal()">×</button>
             </div>
             
-            <form id="satelliteForm" onsubmit="saveSatellite(event)">
+            <form id="satelliteForm" onsubmit="saveSatellite(event); return false;">
                 <div class="form-group required">
                     <label for="satellite-title">Satellite Name</label>
                     <input 
@@ -859,7 +859,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h3>Import Satellites from CSV</h3>
-                <button class="modal-close" type="button" onclick="closeImportModal()">×</button>
+                <button type="button" class="modal-close" onclick="closeImportModal()">×</button>
             </div>
             
             <div class="csv-info">
@@ -867,7 +867,7 @@
                 Title, NORAD_ID, COSPAR_ID, Mission_Type, Status, Orbit_Type, Launch_Date, Sensor_Names
             </div>
 
-            <form id="importForm" onsubmit="handleCSVImport(event)">
+            <form id="importForm" onsubmit="handleCSVImport(event); return false;">
                 <div class="form-group">
                     <label for="csvFile">Choose CSV File</label>
                     <input 
@@ -893,6 +893,7 @@
     <script>
         // ============================================================================
         // SATELLITE SENSOR SURVEY v5.3 - WITH CSV IMPORT (FIXED)
+        // FIXED: Issue with Add Satellite button refreshing page
         // ============================================================================
 
         // Configuration
@@ -1141,7 +1142,7 @@
                 <tr onclick="selectSatellite(${sat.ID})" class="${state.selectedSatellite?.ID === sat.ID ? 'selected' : ''}">
                     <td><strong>${sat.Title}</strong></td>
                     <td>${sat.NORAD_ID}</td>
-                    <td><span class="badge badge-${sat.Status.toLowerCase().replace('-', '')}"> ${sat.Status}</span></td>
+                    <td><span class="badge badge-${sat.Status.toLowerCase().replace('-', '')}">${sat.Status}</span></td>
                     <td>${sat.Orbit_Type}</td>
                 </tr>
             `).join('');
@@ -1247,8 +1248,8 @@
             if (detailTitle) detailTitle.textContent = `Satellite: ${sat.Title}`;
             if (detailContent) detailContent.innerHTML = html;
             if (detailActions) detailActions.innerHTML = `
-                <button class="btn btn-small btn-secondary" onclick="editSatellite(${sat.ID})">Edit</button>
-                <button class="btn btn-small btn-secondary" onclick="deleteSatellite(${sat.ID})">Delete</button>
+                <button type="button" class="btn btn-small btn-secondary" onclick="editSatellite(${sat.ID})">Edit</button>
+                <button type="button" class="btn btn-small btn-secondary" onclick="deleteSatellite(${sat.ID})">Delete</button>
             `;
         }
 
@@ -1390,12 +1391,12 @@
 
             if (!isValid) {
                 showAlert('❌ Please fix validation errors', 'error');
-                return false;
+                return;
             }
 
             if (!config.inSharePoint || !config.siteUrl) {
                 showAlert('⚠️ Save requires SharePoint context and a configured site URL', 'error');
-                return false;
+                return;
             }
 
             try {
@@ -1474,7 +1475,7 @@
                     await loadSatellites();
                     filterAndDisplayData();
                     updateStatistics();
-                    return false;
+                    return;
                 } else {
                     const errorText = await response.text();
                     console.error('API error:', errorText);
@@ -1484,8 +1485,6 @@
                 console.error('Error saving satellite:', error);
                 showAlert('❌ Error: ' + error.message, 'error');
             }
-            
-            return false;
         }
 
         function showValidationError(fieldName, message) {
@@ -1713,12 +1712,12 @@
 
             if (state.csvPreviewData.length === 0) {
                 showAlert('❌ No CSV data to import', 'error');
-                return false;
+                return;
             }
 
             if (!config.inSharePoint || !config.siteUrl) {
                 showAlert('⚠️ Import requires SharePoint context', 'error');
-                return false;
+                return;
             }
 
             try {
@@ -1796,8 +1795,6 @@
                 console.error('Error importing CSV:', error);
                 showAlert('❌ Error: ' + error.message, 'error');
             }
-
-            return false;
         }
 
         // ============================================================================
