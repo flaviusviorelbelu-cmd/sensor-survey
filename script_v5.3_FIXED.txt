@@ -975,6 +975,60 @@
         // ============================================================================
         // INITIALIZATION
         // ============================================================================
+function attachEventListeners() {
+    // Attach click handlers to edit/delete buttons (BOTH existing and dynamic)
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-btn')) {
+            const id = parseInt(e.target.dataset.id);
+            editSatellite(id);
+            e.preventDefault();
+            return false;
+        }
+        if (e.target.classList.contains('delete-btn')) {
+            const id = parseInt(e.target.dataset.id);
+            deleteSatellite(id);
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Attach modal backdrop close handler
+    const addModal = document.getElementById('addSatelliteModal');
+    if (addModal) {
+        addModal.addEventListener('click', handleModalBackdropClick);
+    }
+
+    const importModal = document.getElementById('importModal');
+    if (importModal) {
+        importModal.addEventListener('click', handleImportModalBackdropClick);
+    }
+
+    // Attach form submit handler
+    const form = document.getElementById('satelliteForm');
+    if (form) {
+        form.addEventListener('submit', saveSatellite);
+    }
+
+    // Attach CSV file input handler
+    const csvFile = document.getElementById('csvFile');
+    if (csvFile) {
+        csvFile.addEventListener('change', handleCSVFileSelect);
+    }
+
+    // Attach import form handler
+    const importForm = document.getElementById('importForm');
+    if (importForm) {
+        importForm.addEventListener('submit', handleCSVImport);
+    }
+
+    console.log('✅ Event listeners attached');
+}
+
+// Call this in your initialization function
+attachEventListeners();
+
+
+
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('='*60);
