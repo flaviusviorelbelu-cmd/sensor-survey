@@ -1428,41 +1428,47 @@
             document.querySelectorAll('.form-group input, .form-group textarea, .form-group select').forEach(el => el.classList.remove('error'));
         }
 
-        function saveSatellite(event) {
-            event.preventDefault();
-            clearValidationErrors();
+       function saveSatellite(event) {
+    clearValidationErrors();
 
-            const titleInput = safeGetElement('satellite-title');
-            const noradInput = safeGetElement('satellite-norad');
+    const titleInput = safeGetElement('satellite-title');
+    const noradInput = safeGetElement('satellite-norad');
 
-            let valid = true;
-            if (!titleInput || !titleInput.value.trim()) {
-                showValidationError('title', '❌ Name required');
-                valid = false;
-            }
-            if (!noradInput || !noradInput.value.trim()) {
-                showValidationError('norad', '❌ NORAD ID required');
-                valid = false;
-            }
+    let valid = true;
+    if (!titleInput || !titleInput.value.trim()) {
+        showValidationError('title', '❌ Name required');
+        valid = false;
+    }
+    if (!noradInput || !noradInput.value.trim()) {
+        showValidationError('norad', '❌ NORAD ID required');
+        valid = false;
+    }
 
-            if (!valid) {
-                showAlert('❌ Please fix errors', 'error');
-                return false;
-            }
+    if (!valid) {
+        showAlert('❌ Please fix errors', 'error');
+        return false;
+    }
 
-            const form = safeGetElement('satelliteForm');
-            if (!form) return false;
+    // Get form data directly from the event target
+    const form = event.target;
+    if (!form) {
+        Logger.error('Cannot access form from event');
+        showAlert('❌ Form submission error', 'error');
+        return false;
+    }
 
-            const formData = new FormData(form);
+    const formData = new FormData(form);
+    Logger.log('📋 Form data collected: ' + formData.get('Title'));
 
-            if (config.inSharePoint && config.siteUrl) {
-                saveSatelliteToSharePoint(formData);
-            } else {
-                saveSatelliteToLocalStorage(formData);
-            }
+    if (config.inSharePoint && config.siteUrl) {
+        saveSatelliteToSharePoint(formData);
+    } else {
+        saveSatelliteToLocalStorage(formData);
+    }
 
-            return false;
-        }
+    return false;
+}
+
 
         async function saveSatelliteToSharePoint(formData) {
     try {
