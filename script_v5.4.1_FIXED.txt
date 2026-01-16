@@ -796,15 +796,18 @@
                 </div>
 
                 <div class="form-group required">
-                    <label for="satellite-norad">NORAD ID</label>
-                    <input 
-                        type="text" 
-                        id="satellite-norad"
-                        name="NORAD_ID" 
-                        placeholder="Enter NORAD ID"
-                        pattern="[0-9]*"
-                        maxlength="10"
-                    >
+    <label for="satellite-norad">NORAD ID</label>
+    <input 
+        type="number" 
+        id="satellite-norad"
+        name="NORAD_ID" 
+        placeholder="Enter NORAD ID"
+        step="1"
+        min="0"
+    >
+    <div class="validation-error" id="error-norad"></div>
+</div>
+
                     <div class="validation-error" id="error-norad"></div>
                 </div>
 
@@ -1080,69 +1083,81 @@
         // ============================================================================
 
         function attachAllEventListeners() {
-            Logger.log('🔗 Attaching all event listeners...');
+    Logger.log('🔗 Attaching all event listeners...');
 
-            try {
-                // Search input
-                const searchInput = safeGetElement('searchInput');
-                if (searchInput) {
-                    searchInput.addEventListener('input', (e) => {
-                        state.searchTerm = e.target.value.toLowerCase();
-                        filterAndDisplayData();
-                    });
-                }
-
-                // Modal backdrops
-                const addModal = safeGetElement('addSatelliteModal');
-                if (addModal) {
-                    addModal.addEventListener('click', handleModalBackdropClick);
-                }
-
-                const importModal = safeGetElement('importModal');
-                if (importModal) {
-                    importModal.addEventListener('click', handleImportModalBackdropClick);
-                }
-
-                // Form submit
-                const form = safeGetElement('satelliteForm');
-                if (form) {
-                    form.addEventListener('submit', (e) => saveSatellite(e));
-                    Logger.log('✅ Form listener attached');
-                } else {
-                    Logger.warn('Form not found - skipping attachment');
-                }
-
-                // CSV file input
-                const csvFile = safeGetElement('csvFile');
-                if (csvFile) {
-                    csvFile.addEventListener('change', handleCSVFileSelect);
-                }
-
-                // Import form
-                const importForm = safeGetElement('importForm');
-                if (importForm) {
-                    importForm.addEventListener('submit', (e) => handleCSVImport(e));
-                }
-
-                // Document-level event delegation for edit/delete
-                document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('edit-btn')) {
-                        e.preventDefault();
-                        const id = parseInt(e.target.dataset.id);
-                        if (!isNaN(id)) editSatellite(id);
-                    }
-                    if (e.target.classList.contains('delete-btn')) {
-                        e.preventDefault();
-                        const id = parseInt(e.target.dataset.id);
-                        if (!isNaN(id)) deleteSatellite(id);
-                    }
-                });
-
-                Logger.log('✅ All event listeners attached successfully');
-            } catch (e) {
-                Logger.error('Error attaching event listeners', e.message);
-            }
+    try {
+        // Search input
+        const searchInput = safeGetElement('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                state.searchTerm = e.target.value.toLowerCase();
+                filterAndDisplayData();
+            });
+            Logger.log('✅ Search listener attached');
         }
+
+        // CSV file input
+        const csvFile = safeGetElement('csvFile');
+        if (csvFile) {
+            csvFile.addEventListener('change', handleCSVFileSelect);
+            Logger.log('✅ CSV file listener attached');
+        }
+
+        // Import form
+        const importForm = safeGetElement('importForm');
+        if (importForm) {
+            importForm.addEventListener('submit', (e) => handleCSVImport(e));
+            Logger.log('✅ Import form listener attached');
+        }
+
+        // CRITICAL FIX: Use event delegation for modal backdrop clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'addSatelliteModal') {
+                closeAddSatelliteModal();
+            }
+            if (e.target.id === 'importModal') {
+                closeImportModal();
+            }
+        });
+
+        // CRITICAL FIX: Attach form handler using event delegation
+        // This works even if the form doesn't exist yet
+        document.addEventListener('submit', (e) => {
+            if (e.target.id === 'satelliteForm') {
+                e.preventDefault();
+                saveSatellite(e);
+                Logger.log('📝 Form submitted via event delegation');
+            }
+        });
+        Logger.log('✅ Form handler attached via delegation');
+
+        // Document-level event delegation for edit/delete buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-btn')) {
+                e.preventDefault();
+                const id = parseInt(e.target.dataset.id);
+                if (!isNaN(id)) {
+                    Logger.log('✏️ Edit clicked for ID: ' + id);
+                    editSatellite(id);
+                }
+            }
+            if (e.target.classList.contains('delete-btn')) {
+                e.preventDefault();
+                const id = parseInt(e.target.dataset.id);
+                if (!isNaN(id)) {
+                    Logger.log('🗑️ Delete clicked for ID: ' + id);
+                    deleteSatellite(id);
+                }
+            }
+        });
+        Logger.log('✅ Edit/Delete listeners attached via delegation');
+
+        Logger.log('✅ All event listeners attached successfully');
+    } catch (e) {
+        Logger.error('Error attaching event listeners', e.message);
+    }
+}
+
 
         // ============================================================================
         // SHAREPOINT DATA LOADING
@@ -1450,58 +1465,79 @@
         }
 
         async function saveSatelliteToSharePoint(formData) {
-            try {
-                const payload = {
-                    '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
-                    'Title': formData.get('Title').trim(),
-                    'NORAD_ID': formData.get('NORAD_ID').trim(),
-                    'COSPAR_ID': formData.get('COSPAR_ID')?.trim() || '',
-                    'Mission_Type': formData.get('Mission_Type')?.trim() || '',
-                    'Status': formData.get('Status') || 'Operational',
-                    'Orbit_Type': formData.get('Orbit_Type') || '',
-                    'Launch_Date': formData.get('Launch_Date') ? new Date(formData.get('Launch_Date')).toISOString() : null,
-                    'Sensor_Names': formData.get('Sensor_Names')?.trim() || ''
-                };
+    try {
+        const payload = {
+            '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
+            'Title': formData.get('Title').trim(),
+            'NORAD_ID': parseFloat(formData.get('NORAD_ID').trim()) || 0,
+            'COSPAR_ID': formData.get('COSPAR_ID')?.trim() || '',
+            'Mission_Type': formData.get('Mission_Type')?.trim() || '',
+            'Status': formData.get('Status') || 'Operational',
+            'Orbit_Type': formData.get('Orbit_Type') || '',
+            'Launch_Date': formData.get('Launch_Date') ? new Date(formData.get('Launch_Date')).toISOString() : null,
+            'Sensor_Names': formData.get('Sensor_Names')?.trim() || ''
+        };
 
-                const contextUrl = config.siteUrl + '/_api/contextinfo';
-                const digestResponse = await fetch(contextUrl, {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json;odata=verbose' },
-                    credentials: 'include'
-                });
+        Logger.log('Payload prepared:', JSON.stringify(payload));
 
-                if (!digestResponse.ok) throw new Error('Failed to get digest');
+        const contextUrl = config.siteUrl + '/_api/contextinfo';
+        const digestResponse = await fetch(contextUrl, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json;odata=verbose' },
+            credentials: 'include'
+        });
 
-                const digestData = await digestResponse.json();
-                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
-
-                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items` +
-                    (state.editingId ? `(${state.editingId})` : '');
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json;odata=verbose',
-                        'Content-Type': 'application/json;odata=verbose',
-                        'X-RequestDigest': digest,
-                        ...(state.editingId && { 'X-HTTP-Method': 'MERGE', 'IF-MATCH': '*' })
-                    },
-                    body: JSON.stringify(payload),
-                    credentials: 'include'
-                });
-
-                if (response.ok || response.status === 201 || response.status === 204) {
-                    showAlert('✅ Saved!', 'success');
-                    closeAddSatelliteModal();
-                    await loadSatellites();
-                    filterAndDisplayData();
-                    updateStatistics();
-                }
-            } catch (e) {
-                Logger.error('Error saving to SharePoint', e.message);
-                showAlert('❌ Error: ' + e.message, 'error');
-            }
+        if (!digestResponse.ok) {
+            throw new Error('Failed to get digest token: ' + digestResponse.statusText);
         }
+
+        const digestData = await digestResponse.json();
+        const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+        const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items` +
+            (state.editingId ? `(${state.editingId})` : '');
+
+        Logger.log(`${state.editingId ? 'Updating' : 'Creating'} satellite at: ${url}`);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json;odata=verbose',
+                'Content-Type': 'application/json;odata=verbose',
+                'X-RequestDigest': digest,
+                ...(state.editingId && { 'X-HTTP-Method': 'MERGE', 'IF-MATCH': '*' })
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        });
+
+        const responseText = await response.text();
+        Logger.log('Response status: ' + response.status);
+        Logger.log('Response body: ' + responseText);
+
+        if (response.ok || response.status === 201 || response.status === 204) {
+            showAlert(`✅ ${state.editingId ? 'Updated' : 'Created'} successfully!`, 'success');
+            closeAddSatelliteModal();
+            await loadSatellites();
+            filterAndDisplayData();
+            updateStatistics();
+        } else {
+            // Parse error from SharePoint
+            let errorMsg = 'Unknown error';
+            try {
+                const errorData = JSON.parse(responseText);
+                errorMsg = errorData.error?.message?.value || errorData.error?.message || errorMsg;
+            } catch (e) {
+                errorMsg = responseText || response.statusText;
+            }
+            throw new Error(`HTTP ${response.status}: ${errorMsg}`);
+        }
+    } catch (e) {
+        Logger.error('Error saving to SharePoint', e.message);
+        showAlert('❌ Save failed: ' + e.message, 'error');
+    }
+}
+
 
         function saveSatelliteToLocalStorage(formData) {
             const title = formData.get('Title').trim();
@@ -1554,28 +1590,41 @@
         }
 
         function editSatellite(id) {
-            const sat = state.satellites.find(s => s.ID === id);
-            if (!sat) return;
+    const sat = state.satellites.find(s => s.ID === id);
+    if (!sat) {
+        Logger.error('Satellite not found: ' + id);
+        showAlert('❌ Satellite not found', 'error');
+        return;
+    }
 
-            state.editingId = id;
+    state.editingId = id;
 
-            const form = safeGetElement('satelliteForm');
-            if (!form) return;
+    // Use getElementById instead of querySelector for reliability
+    const titleInput = safeGetElement('satellite-title');
+    const noradInput = safeGetElement('satellite-norad');
+    const cosparInput = safeGetElement('satellite-cospar');
+    const missionInput = safeGetElement('satellite-mission');
+    const statusInput = safeGetElement('satellite-status');
+    const orbitInput = safeGetElement('satellite-orbit');
+    const launchInput = safeGetElement('satellite-launch');
+    const sensorsInput = safeGetElement('satellite-sensors');
 
-            form.querySelector('[name="Title"]').value = sat.Title || '';
-            form.querySelector('[name="NORAD_ID"]').value = sat.NORAD_ID || '';
-            form.querySelector('[name="COSPAR_ID"]').value = sat.COSPAR_ID || '';
-            form.querySelector('[name="Mission_Type"]').value = sat.Mission_Type || '';
-            form.querySelector('[name="Status"]').value = sat.Status || 'Operational';
-            form.querySelector('[name="Orbit_Type"]').value = sat.Orbit_Type || '';
-            form.querySelector('[name="Launch_Date"]').value = sat.Launch_Date || '';
-            form.querySelector('[name="Sensor_Names"]').value = sat.Sensor_Names || '';
+    if (titleInput) titleInput.value = sat.Title || '';
+    if (noradInput) noradInput.value = sat.NORAD_ID || '';
+    if (cosparInput) cosparInput.value = sat.COSPAR_ID || '';
+    if (missionInput) missionInput.value = sat.Mission_Type || '';
+    if (statusInput) statusInput.value = sat.Status || 'Operational';
+    if (orbitInput) orbitInput.value = sat.Orbit_Type || '';
+    if (launchInput) launchInput.value = sat.Launch_Date || '';
+    if (sensorsInput) sensorsInput.value = sat.Sensor_Names || '';
 
-            const title = safeGetElement('modalTitle');
-            if (title) title.textContent = `Edit: ${sat.Title}`;
+    const modalTitle = safeGetElement('modalTitle');
+    if (modalTitle) modalTitle.textContent = `Edit: ${sat.Title}`;
 
-            showAddSatelliteModal();
-        }
+    showAddSatelliteModal();
+    Logger.log('✅ Edit form populated for ID: ' + id);
+}
+
 
         function deleteSatellite(id) {
             if (!confirm('Delete this satellite?')) return false;
@@ -1931,6 +1980,18 @@
             document.body.removeChild(link);
             return false;
         }
+
+// Temporary debug helper
+window.debugSatelliteForm = function() {
+    console.log('=== Form Debug Info ===');
+    console.log('EditingId:', state.editingId);
+    console.log('Title:', safeGetElement('satellite-title')?.value);
+    console.log('NORAD:', safeGetElement('satellite-norad')?.value);
+    console.log('Status:', safeGetElement('satellite-status')?.value);
+    console.log('Form element:', safeGetElement('satelliteForm'));
+    console.log('Modal visible:', safeGetElement('addSatelliteModal')?.classList.contains('active'));
+};
+
     </script>
 </body>
 </html>
