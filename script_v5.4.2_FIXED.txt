@@ -11,13 +11,13 @@
     box-sizing: border-box;
 }
 
-#addSatelliteModal . modal-content,
-#importModal . modal-content {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif ! important;
+#addSatelliteModal .modal-content,
+#importModal .modal-content {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Ensure modal is above SharePoint chrome */
-. modal {
+.modal {
     z-index: 99999 !important;
 }
 
@@ -27,7 +27,7 @@
     z-index: 1000 !important;
 }
 
-        : root {
+        :root {
             --color-primary: #2180A3;
             --color-primary-hover: #1D6E80;
             --color-success: #32B8C6;
@@ -36,11 +36,11 @@
             --color-bg: #FCFCF9;
             --color-surface: #FFFFFF;
             --color-text: #134252;
-            --color-text-secondary:  #628076;
+            --color-text-secondary: #628076;
             --color-border: rgba(94, 82, 64, 0.2);
             --color-shadow: rgba(0, 0, 0, 0.08);
-            --radius:  8px;
-            --spacing:  16px;
+            --radius: 8px;
+            --spacing: 16px;
         }
 
         * {
@@ -51,19 +51,19 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background:  var(--color-bg);
+            background: var(--color-bg);
             color: var(--color-text);
             line-height: 1.5;
         }
 
         .container {
-            max-width:  1400px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding:  var(--spacing);
+            padding: var(--spacing);
         }
 
         header {
-            background:  var(--color-surface);
+            background: var(--color-surface);
             border-bottom: 1px solid var(--color-border);
             padding: var(--spacing) 0;
             margin-bottom: var(--spacing);
@@ -71,11 +71,11 @@
 
         header h1 {
             margin: 0;
-            font-size:  28px;
+            font-size: 28px;
             color: var(--color-primary);
         }
 
-        . header-subtitle {
+        .header-subtitle {
             color: var(--color-text-secondary);
             font-size: 14px;
             margin-top: 4px;
@@ -100,11 +100,11 @@
         .stat-value {
             font-size: 32px;
             font-weight: 600;
-            color:  var(--color-primary);
-            margin:  8px 0;
+            color: var(--color-primary);
+            margin: 8px 0;
         }
 
-        . stat-label {
+        .stat-label {
             font-size: 12px;
             color: var(--color-text-secondary);
             text-transform: uppercase;
@@ -128,7 +128,7 @@
 
         .search-box input {
             flex: 1;
-            padding:  10px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--color-border);
             border-radius: var(--radius);
             font-size: 14px;
@@ -136,13 +136,13 @@
             color: var(--color-text);
         }
 
-        .search-box input:: placeholder {
+        .search-box input::placeholder {
             color: var(--color-text-secondary);
         }
 
         .search-box input:focus {
             outline: none;
-            border-color:  var(--color-primary);
+            border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
         }
 
@@ -153,10 +153,10 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition:  all 150ms ease;
+            transition: all 150ms ease;
             display: inline-flex;
             align-items: center;
-            gap:  8px;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -170,9 +170,9 @@
         }
 
         .btn-secondary {
-            background:  transparent;
-            color:  var(--color-primary);
-            border:  1px solid var(--color-primary);
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
         }
 
         .btn-secondary:hover {
@@ -180,18 +180,18 @@
         }
 
         .btn-small {
-            padding:  6px 12px;
+            padding: 6px 12px;
             font-size: 12px;
         }
 
-        .btn: disabled {
-            opacity:  0.5;
-            cursor:  not-allowed;
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .content-grid {
-            display:  grid;
-            grid-template-columns:  1fr 1fr;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: var(--spacing);
             margin-bottom: var(--spacing);
         }
@@ -212,11 +212,11 @@
 
         .panel-header {
             display: flex;
-            justify-content:  space-between;
-            align-items:  center;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: var(--spacing);
             border-bottom: 2px solid var(--color-border);
-            padding-bottom:  12px;
+            padding-bottom: 12px;
         }
 
         .panel-header h2 {
@@ -225,28 +225,28 @@
             color: var(--color-primary);
         }
 
-        . filter-group {
-            display:  flex;
+        .filter-group {
+            display: flex;
             gap: 8px;
             margin-bottom: var(--spacing);
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding:  8px 12px;
+            padding: 8px 12px;
             border: 1px solid var(--color-border);
             background: var(--color-surface);
             border-radius: var(--radius);
             cursor: pointer;
-            font-size:  12px;
+            font-size: 12px;
             transition: all 150ms ease;
             color: var(--color-text);
         }
 
-        .filter-btn. active {
+        .filter-btn.active {
             background: var(--color-primary);
             color: white;
-            border-color:  var(--color-primary);
+            border-color: var(--color-primary);
         }
 
         .filter-btn:hover {
@@ -260,18 +260,18 @@
         }
 
         table {
-            width:  100%;
+            width: 100%;
             border-collapse: collapse;
             background: var(--color-surface);
         }
 
         thead {
-            background:  rgba(33, 128, 141, 0.08);
+            background: rgba(33, 128, 141, 0.08);
             border-bottom: 2px solid var(--color-border);
         }
 
         th {
-            padding:  12px;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
             font-size: 12px;
@@ -287,8 +287,8 @@
         }
 
         td {
-            padding:  12px;
-            border-bottom:  1px solid var(--color-border);
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
             font-size: 13px;
         }
 
@@ -301,11 +301,11 @@
             cursor: pointer;
         }
 
-        tbody tr. selected {
-            background:  rgba(33, 128, 141, 0.1);
+        tbody tr.selected {
+            background: rgba(33, 128, 141, 0.1);
         }
 
-        . badge {
+        .badge {
             display: inline-block;
             padding: 4px 8px;
             border-radius: 4px;
@@ -316,27 +316,27 @@
         }
 
         .badge-operational {
-            background:  rgba(50, 184, 198, 0.2);
-            color:  var(--color-success);
+            background: rgba(50, 184, 198, 0.2);
+            color: var(--color-success);
         }
 
         .badge-testing {
-            background:  rgba(230, 129, 97, 0.2);
-            color:  var(--color-warning);
+            background: rgba(230, 129, 97, 0.2);
+            color: var(--color-warning);
         }
 
         .badge-decommissioned {
             background: rgba(192, 21, 47, 0.2);
-            color:  var(--color-error);
+            color: var(--color-error);
         }
 
         .detail-view {
-            display:  grid;
+            display: grid;
             gap: 12px;
         }
 
         .detail-row {
-            display:  grid;
+            display: grid;
             grid-template-columns: 150px 1fr;
             gap: 12px;
         }
@@ -356,60 +356,61 @@
         }
 
         .sensors-list {
-            display:  flex;
+            display: flex;
             flex-wrap: wrap;
             gap: 6px;
             padding-top: 6px;
         }
 
         .sensor-tag {
-            background:  rgba(33, 128, 141, 0.15);
-            color:  var(--color-primary);
-            padding:  4px 10px;
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-primary);
+            padding: 4px 10px;
             border-radius: 4px;
             font-size: 12px;
             display: inline-block;
         }
 
-        .modal {
-            display:  none;
-            position: fixed;
-            z-index: 99999;
-            left: 0;
-            top: 0;
-            width:  100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.65);
-            overflow: auto;
-            backdrop-filter: blur(2px);
-        }
+       .modal {
+    display: none;
+    position: fixed;
+    z-index: 99999;  /* Changed from 1000 to 99999 to be above SharePoint */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);  /* Darker backdrop */
+    overflow: auto;
+    backdrop-filter: blur(2px);  /* Add blur effect */
+}
 
-        .modal. active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .modal-content {
-            background-color: var(--color-surface);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            z-index: 100000;
-        }
+.modal-content {
+    background-color: var(--color-surface);
+    padding: 24px;  /* Increased padding */
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);  /* Stronger shadow */
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;  /* Added */
+    z-index: 100000;  /* Above modal backdrop */
+}
+
 
         .modal-header {
-            display:  flex;
+            display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: var(--spacing);
             padding-bottom: var(--spacing);
-            border-bottom:  1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
         }
 
         .modal-header h3 {
@@ -419,14 +420,14 @@
 
         .modal h2 {
             margin-top: 0;
-            margin-bottom:  var(--spacing);
+            margin-bottom: var(--spacing);
             color: var(--color-primary);
         }
 
         .modal-close {
             background: none;
             border: none;
-            font-size:  24px;
+            font-size: 24px;
             cursor: pointer;
             color: var(--color-text-secondary);
         }
@@ -441,13 +442,13 @@
 
         .form-group label {
             display: block;
-            margin-bottom:  6px;
+            margin-bottom: 6px;
             font-weight: 600;
-            color:  var(--color-text);
+            color: var(--color-text);
             font-size: 13px;
         }
 
-        .form-group. required label:: after {
+        .form-group.required label::after {
             content: ' *';
             color: var(--color-error);
         }
@@ -465,9 +466,9 @@
             background: var(--color-surface);
         }
 
-        .form-group input: focus,
-        . form-group textarea: focus,
-        . form-group select: focus {
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
@@ -486,7 +487,7 @@
         }
 
         .form-actions {
-            display:  flex;
+            display: flex;
             gap: 12px;
             margin-top: var(--spacing);
         }
@@ -501,12 +502,12 @@
             justify-content: flex-end;
             margin-top: var(--spacing);
             padding-top: var(--spacing);
-            border-top:  1px solid var(--color-border);
+            border-top: 1px solid var(--color-border);
         }
 
         .empty-state {
             text-align: center;
-            padding:  40px var(--spacing);
+            padding: 40px var(--spacing);
             color: var(--color-text-secondary);
         }
 
@@ -516,12 +517,12 @@
         }
 
         .loading {
-            display:  inline-block;
+            display: inline-block;
             width: 20px;
-            height:  20px;
+            height: 20px;
             border: 3px solid rgba(33, 128, 141, 0.2);
             border-top-color: var(--color-primary);
-            border-radius:  50%;
+            border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
@@ -529,12 +530,12 @@
             to { transform: rotate(360deg); }
         }
 
-        . alert {
+        .alert {
             padding: 12px 16px;
             border-radius: var(--radius);
             margin-bottom: var(--spacing);
             display: flex;
-            align-items:  center;
+            align-items: center;
             gap: 12px;
             animation: slideIn 300ms ease-out;
         }
@@ -550,47 +551,47 @@
             }
         }
 
-        . alert-success {
+        .alert-success {
             background: rgba(50, 184, 198, 0.1);
             color: var(--color-success);
             border: 1px solid rgba(50, 184, 198, 0.3);
         }
 
         .alert-error {
-            background:  rgba(192, 21, 47, 0.1);
+            background: rgba(192, 21, 47, 0.1);
             color: var(--color-error);
-            border:  1px solid rgba(192, 21, 47, 0.3);
+            border: 1px solid rgba(192, 21, 47, 0.3);
         }
 
-        . alert-info {
-            background:  rgba(33, 128, 141, 0.1);
+        .alert-info {
+            background: rgba(33, 128, 141, 0.1);
             color: var(--color-primary);
-            border:  1px solid rgba(33, 128, 141, 0.3);
+            border: 1px solid rgba(33, 128, 141, 0.3);
         }
 
-        . alert-warning {
+        .alert-warning {
             background: rgba(230, 129, 97, 0.1);
             color: var(--color-warning);
             border: 1px solid rgba(230, 129, 97, 0.3);
         }
 
         .tabs {
-            display:  flex;
+            display: flex;
             border-bottom: 2px solid var(--color-border);
-            margin-bottom:  var(--spacing);
+            margin-bottom: var(--spacing);
             gap: 4px;
         }
 
         .tab-btn {
-            padding:  12px 16px;
+            padding: 12px 16px;
             background: none;
-            border:  none;
+            border: none;
             cursor: pointer;
             color: var(--color-text-secondary);
             font-weight: 500;
             font-size: 14px;
             border-bottom: 3px solid transparent;
-            transition:  all 150ms ease;
+            transition: all 150ms ease;
         }
 
         .tab-btn.active {
@@ -602,8 +603,8 @@
             display: none;
         }
 
-        . tab-content.active {
-            display:  block;
+        .tab-content.active {
+            display: block;
         }
 
         .validation-error {
@@ -615,19 +616,19 @@
         }
 
         .storage-indicator {
-            display:  inline-block;
+            display: inline-block;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
             margin-left: 8px;
             background: rgba(50, 184, 198, 0.15);
-            color:  var(--color-success);
+            color: var(--color-success);
         }
 
         .csv-info {
             background: rgba(33, 128, 141, 0.05);
-            border:  1px solid rgba(33, 128, 141, 0.2);
+            border: 1px solid rgba(33, 128, 141, 0.2);
             border-radius: var(--radius);
             padding: 12px;
             margin-bottom: var(--spacing);
@@ -636,12 +637,12 @@
         }
 
         .csv-info strong {
-            color:  var(--color-primary);
+            color: var(--color-primary);
         }
 
         .import-preview {
             background: var(--color-bg);
-            border:  1px solid var(--color-border);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius);
             padding: 12px;
             margin-top: 12px;
@@ -665,7 +666,7 @@
         }
 
         .action-btn {
-            padding:  4px 8px;
+            padding: 4px 8px;
             font-size: 11px;
             white-space: nowrap;
         }
@@ -675,7 +676,7 @@
     <header>
         <div class="container">
             <h1>🛰️ Satellite Sensor Survey v5.4.2</h1>
-            <p class="header-subtitle">Fixed Add/Edit Satellite Functions - Real-time satellite and sensor management with CSV import <span class="storage-indicator" id="storageIndicator">Local Storage Mode</span></p>
+            <p class="header-subtitle">Enhanced Error Handling & Real-time satellite and sensor management with CSV import <span class="storage-indicator" id="storageIndicator">Local Storage Mode</span></p>
         </div>
     </header>
 
@@ -706,7 +707,7 @@
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search satellites, sensors, or NORAD IDs... ">
+                <input type="text" id="searchInput" placeholder="Search satellites, sensors, or NORAD IDs...">
             </div>
             <button type="button" class="btn btn-primary" onclick="showAddSatelliteModal(); return false;">+ Add Satellite</button>
             <button type="button" class="btn btn-secondary" onclick="showImportModal(); return false;">📤 Import CSV</button>
@@ -799,7 +800,7 @@
         </div>
     </main>
 
-    <!-- Add/Edit Satellite Modal - FIXED:  Removed duplicate form elements -->
+    <!-- Add/Edit Satellite Modal -->
     <div id="addSatelliteModal" class="modal" onclick="handleModalBackdropClick(event); return false;">
         <div class="modal-content" onclick="event.stopPropagation();">
             <div class="modal-header">
@@ -820,19 +821,18 @@
                     <div class="validation-error" id="error-title"></div>
                 </div>
 
-                <!-- FIXED: Single NORAD ID form group (removed duplicate) -->
                 <div class="form-group required">
-                    <label for="satellite-norad">NORAD ID</label>
-                    <input 
-                        type="number" 
-                        id="satellite-norad"
-                        name="NORAD_ID" 
-                        placeholder="Enter NORAD ID"
-                        step="1"
-                        min="0"
-                    >
-                    <div class="validation-error" id="error-norad"></div>
-                </div>
+    <label for="satellite-norad">NORAD ID</label>
+    <input 
+        type="number" 
+        id="satellite-norad"
+        name="NORAD_ID" 
+        placeholder="Enter NORAD ID"
+        step="1"
+        min="0"
+    >
+    <div class="validation-error" id="error-norad"></div>
+</div>
 
                 <div class="form-group">
                     <label for="satellite-cospar">COSPAR ID</label>
@@ -852,7 +852,7 @@
                         type="text" 
                         id="satellite-mission"
                         name="Mission_Type" 
-                        placeholder="e. g., Earth Observation"
+                        placeholder="e.g., Earth Observation"
                         maxlength="100"
                     >
                 </div>
@@ -916,7 +916,7 @@
             </div>
             
             <div class="csv-info">
-                <strong>CSV Format:</strong> Your file should have these columns: <br>
+                <strong>CSV Format:</strong> Your file should have these columns:<br>
                 Title, NORAD_ID, COSPAR_ID, Mission_Type, Status, Orbit_Type, Launch_Date, Sensor_Names
             </div>
 
@@ -932,7 +932,7 @@
                     <div class="validation-error" id="error-csv"></div>
                 </div>
 
-                <div id="importPreview" class="import-preview" style="display: none;"></div>
+                <div id="importPreview" class="import-preview" style="display:none;"></div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Import Data</button>
@@ -946,12 +946,16 @@
         // ============================================================================
         // SATELLITE SENSOR SURVEY v5.4.2 - FIXED ADD/EDIT SATELLITE FUNCTIONS
         // ============================================================================
-        // Changes in v5.4.2:
-        // - Fixed duplicate NORAD ID form group in HTML
-        // - Fixed saveSatellite function with proper validation
-        // - Fixed saveSatelliteToSharePoint with correct payload and error handling
-        // - Fixed editSatellite function to properly populate form fields
-        // - Added comprehensive logging for debugging
+        // 
+        // CHANGELOG v5.4.2:
+        // - Fixed duplicate HTML validation error div for NORAD ID field
+        // - Fixed extra closing div tag in satellite form
+        // - Enhanced saveSatellite function with improved validation and logging
+        // - Fixed saveSatelliteToSharePoint to properly handle CREATE vs UPDATE operations
+        // - Added proper request digest fetching with error handling
+        // - Changed NORAD_ID from parseFloat to parseInt for correct data type
+        // - Added state.editingId reset after successful save
+        // - Enhanced editSatellite function with debug logging and error handling
         // ============================================================================
 
         // Configuration
@@ -961,7 +965,7 @@
             useMultiSelectChoice: false,
             inSharePoint: typeof _spPageContextInfo !== 'undefined' && 
                          _spPageContextInfo && 
-                         _spPageContextInfo.webAbsoluteUrl ?  true : false,
+                         _spPageContextInfo.webAbsoluteUrl ? true : false,
             siteUrl: typeof _spPageContextInfo !== 'undefined' && 
                     _spPageContextInfo && 
                     _spPageContextInfo.webAbsoluteUrl ? _spPageContextInfo.webAbsoluteUrl : '',
@@ -978,547 +982,269 @@
             selectedSensor: null,
             searchTerm: '',
             sortColumn: 'Title',
-            sortDirection:  'asc',
+            sortDirection: 'asc',
             currentFilter: 'all',
             editingId: null,
             csvPreviewData: [],
             nextId: 1000
         };
 
-        // Logger with debug level
+        // Logger
         const Logger = {
             log: function(msg) { console.log('[INFO]', msg); },
             error: function(msg, data) { console.error('[ERROR]', msg, data || ''); },
-            warn: function(msg) { console.warn('[WARN]', msg); },
-            debug: function(msg, data) { console.log('[DEBUG]', msg, data || ''); }
+            warn: function(msg) { console.warn('[WARN]', msg); }
         };
 
         // ============================================================================
-        // SAFE DOM ELEMENT ACCESS
+        // SAFE DOM ELEMENT ACCESS - DEFERRED UNTIL DOM READY
         // ============================================================================
 
         function safeGetElement(id) {
             try {
                 const el = document.getElementById(id);
                 if (!el) {
-                    Logger.warn(`Element not found:  id:  '${id}'`);
+                    Logger.warn(`Element not found: id: '${id}'`);
                     return null;
                 }
                 return el;
             } catch (e) {
-                Logger.error(`Error getting element ${id}: `, e.message);
+                Logger.error(`Error accessing element '${id}'`, e.message);
                 return null;
             }
         }
 
-        // ============================================================================
-        // UTILITY FUNCTIONS
-        // ============================================================================
-
-        function escapeHtml(text) {
-            if (! text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showAlert(message, type = 'info') {
-            const container = safeGetElement('alertContainer');
-            if (! container) return;
-
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = message;
-            container. appendChild(alert);
-
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
-        function clearValidationErrors() {
-            const errorElements = document.querySelectorAll('.validation-error');
-            errorElements. forEach(el => el.textContent = '');
-            
-            const inputs = document.querySelectorAll('. form-group input, .form-group textarea, .form-group select');
-            inputs. forEach(input => input.classList.remove('error'));
-        }
-
-        function showValidationError(fieldName, message) {
-            const errorEl = safeGetElement(`error-${fieldName}`);
-            const inputEl = safeGetElement(`satellite-${fieldName}`);
-            
-            if (errorEl) errorEl.textContent = message;
-            if (inputEl) inputEl.classList.add('error');
-        }
-
-        // ============================================================================
-        // MODAL FUNCTIONS
-        // ============================================================================
-
-        function showAddSatelliteModal() {
-            Logger.debug('Opening Add Satellite Modal');
-            clearValidationErrors();
-            
-            const form = safeGetElement('satelliteForm');
-            if (form) form.reset();
-            
-            const modalTitle = safeGetElement('modalTitle');
-            if (modalTitle) modalTitle.textContent = 'Add New Satellite';
-            
-            state.editingId = null;
-            
-            const modal = safeGetElement('addSatelliteModal');
-            if (modal) {
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                Logger.debug('Modal displayed');
+        function safeSetEventListener(elementId, eventType, handler) {
+            const el = safeGetElement(elementId);
+            if (el && handler) {
+                try {
+                    el.addEventListener(eventType, handler);
+                    Logger.log(`✅ Event listener attached: ${elementId}`);
+                } catch (e) {
+                    Logger.error(`Failed to attach event to ${elementId}`, e.message);
+                }
             }
-            return false;
-        }
-
-        function closeAddSatelliteModal() {
-            Logger. debug('Closing Add Satellite Modal');
-            const modal = safeGetElement('addSatelliteModal');
-            if (modal) modal.classList.remove('active');
-            
-            const form = safeGetElement('satelliteForm');
-            if (form) form.reset();
-            
-            clearValidationErrors();
-            state.editingId = null;
-            document.body.style. overflow = '';
-            
-            return false;
-        }
-
-        function handleModalBackdropClick(event) {
-            if (event. target. classList.contains('modal')) {
-                closeAddSatelliteModal();
-            }
-            return false;
-        }
-
-        function showImportModal() {
-            const modal = safeGetElement('importModal');
-            if (modal) {
-                modal. classList.add('active');
-                document. body.style.overflow = 'hidden';
-            }
-            return false;
-        }
-
-        function closeImportModal() {
-            const modal = safeGetElement('importModal');
-            if (modal) modal.classList.remove('active');
-            
-            const form = safeGetElement('importForm');
-            if (form) form.reset();
-            
-            const preview = safeGetElement('importPreview');
-            if (preview) {
-                preview.style.display = 'none';
-                preview.innerHTML = '';
-            }
-            
-            document.body.style. overflow = '';
-            return false;
-        }
-
-        function handleImportModalBackdropClick(event) {
-            if (event.target.classList.contains('modal')) {
-                closeImportModal();
-            }
-            return false;
         }
 
         // ============================================================================
-        // FIXED:  SAVE SATELLITE FUNCTION
+        // LOCAL STORAGE
         // ============================================================================
 
-        function saveSatellite(event) {
-            event.preventDefault();
-            Logger.debug('saveSatellite called');
-            clearValidationErrors();
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('satellites_data', JSON.stringify(state.satellites));
+                localStorage.setItem('nextId', state.nextId.toString());
+                Logger.log('✅ Data saved to localStorage');
+            } catch (e) {
+                Logger.error('Failed to save to localStorage', e.message);
+                showAlert('⚠️  Warning: Could not save to browser storage', 'warning');
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const stored = localStorage.getItem('satellites_data');
+                if (stored) {
+                    state.satellites = JSON.parse(stored);
+                    Logger.log('✅ Data loaded from localStorage: ' + state.satellites.length);
+                } else {
+                    Logger.log('ℹ️ No stored data found');
+                }
+                const id = localStorage.getItem('nextId');
+                if (id) state.nextId = parseInt(id);
+            } catch (e) {
+                Logger.error('Failed to load from localStorage', e.message);
+                state.satellites = [];
+            }
+        }
+
+        // ============================================================================
+        // INITIALIZE WHEN DOM IS READY
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            Logger.log('🚀 Initializing Satellite Sensor Survey v5.4.1');
+            Logger.log('SharePoint Mode: ' + (config.inSharePoint ? 'YES' : 'NO'));
 
             try {
-                const titleInput = safeGetElement('satellite-title');
-                const noradInput = safeGetElement('satellite-norad');
-
-                let isValid = true;
-
-                // Validate Title
-                if (!titleInput || ! titleInput.value. trim()) {
-                    showValidationError('title', 'Satellite Name is required');
-                    isValid = false;
+                // Update indicator
+                const indicator = safeGetElement('storageIndicator');
+                if (indicator) {
+                    if (config.inSharePoint) {
+                        indicator.textContent = 'SharePoint Mode (Connected)';
+                        indicator.style.background = 'rgba(50, 184, 198, 0.15)';
+                    } else {
+                        indicator.textContent = 'Local Storage Mode';
+                        indicator.style.background = 'rgba(230, 129, 97, 0.15)';
+                    }
                 }
 
-                // Validate NORAD ID
-                if (!noradInput || !noradInput.value.trim()) {
-                    showValidationError('norad', 'NORAD ID is required');
-                    isValid = false;
-                } else if (isNaN(parseInt(noradInput. value))) {
-                    showValidationError('norad', 'NORAD ID must be a number');
-                    isValid = false;
-                }
-
-                if (! isValid) {
-                    Logger.warn('Validation failed');
-                    showAlert('❌ Please fix validation errors', 'error');
-                    return false;
-                }
-
-                Logger.log('📝 Saving satellite.. .');
-
-                const form = safeGetElement('satelliteForm');
-                if (!form) {
-                    showAlert('❌ Form not found', 'error');
-                    return false;
-                }
-
-                const formData = new FormData(form);
-                Logger.debug('Form data collected', { title: formData.get('Title'), norad: formData.get('NORAD_ID') });
-
+                // Load data
                 if (config.inSharePoint && config.siteUrl) {
-                    Logger.log('Saving to SharePoint.. .');
-                    saveSatelliteToSharePoint(formData);
+                    loadSatellites();
                 } else {
-                    Logger. log('Saving to Local Storage.. .');
-                    saveSatelliteToLocalStorage(formData);
-                }
-
-                return false;
-            } catch (error) {
-                Logger.error('Error in saveSatellite:', error. message);
-                showAlert('❌ Error:  ' + error.message, 'error');
-                return false;
-            }
-        }
-
-        // ============================================================================
-        // FIXED:  SAVE TO SHAREPOINT FUNCTION
-        // ============================================================================
-
-        async function saveSatelliteToSharePoint(formData) {
-            try {
-                Logger.log('Getting request digest...');
-                
-                // Get request digest
-                const contextUrl = config.siteUrl + '/_api/contextinfo';
-                const digestResponse = await fetch(contextUrl, {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json;odata=verbose' },
-                    credentials: 'include'
-                });
-
-                if (!digestResponse. ok) {
-                    throw new Error('Failed to get request digest:  HTTP ' + digestResponse. status);
-                }
-
-                const digestData = await digestResponse. json();
-                const digest = digestData. d. GetContextWebInformation.FormDigestValue;
-                Logger.debug('Got digest', digest. substring(0, 50) + '...');
-
-                // Build payload - FIXED: ensure correct data types
-                const payload = {
-                    '__metadata': { 'type': 'SP. Data. Satellite_x005f_FixedListItem' },
-                    'Title': formData.get('Title').trim(),
-                    'NORAD_ID': parseInt(formData.get('NORAD_ID').trim()) || 0,
-                    'COSPAR_ID': formData.get('COSPAR_ID')?.trim() || '',
-                    'Mission_Type': formData.get('Mission_Type')?.trim() || '',
-                    'Status': formData.get('Status') || 'Operational',
-                    'Orbit_Type': formData.get('Orbit_Type') || '',
-                    'Launch_Date': formData.get('Launch_Date') ? new Date(formData.get('Launch_Date')).toISOString() : null,
-                    'Sensor_Names':  formData.get('Sensor_Names')?.trim() || ''
-                };
-
-                Logger. debug('Payload built', payload);
-
-                let url, method, headers;
-
-                if (state.editingId) {
-                    // UPDATE existing satellite
-                    Logger.log('Updating satellite ID:  ' + state.editingId);
-                    url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${state.editingId})`;
-                    method = 'POST';
-                    headers = {
-                        'Accept': 'application/json;odata=verbose',
-                        'Content-Type':  'application/json;odata=verbose',
-                        'X-RequestDigest': digest,
-                        'X-HTTP-Method': 'MERGE',
-                        'IF-MATCH': '*'
-                    };
-                } else {
-                    // CREATE new satellite
-                    Logger.log('Creating new satellite');
-                    url = config. siteUrl + `/_api/web/lists/getbytitle('${config. satelliteList}')/items`;
-                    method = 'POST';
-                    headers = {
-                        'Accept': 'application/json;odata=verbose',
-                        'Content-Type': 'application/json;odata=verbose',
-                        'X-RequestDigest': digest
-                    };
-                }
-
-                Logger. debug('Sending request to:  ' + url);
-
-                const response = await fetch(url, {
-                    method:  method,
-                    headers: headers,
-                    body: JSON.stringify(payload),
-                    credentials:  'include'
-                });
-
-                Logger.debug('Response status:  ' + response.status);
-
-                if (response.ok || response.status === 201 || response.status === 204) {
-                    const action = state.editingId ? 'updated' : 'added';
-                    Logger.log(`✅ Satellite ${action} successfully`);
-                    showAlert(`✅ Satellite ${action} successfully! `, 'success');
-                    
-                    closeAddSatelliteModal();
-                    state.editingId = null;
-                    
-                    await loadSatellites();
-                    filterAndDisplayData();
-                    updateStatistics();
-                } else {
-                    // Get detailed error message
-                    const responseText = await response. text();
-                    let errorMsg = `HTTP ${response.status}`;
-                    try {
-                        const errorData = JSON. parse(responseText);
-                        errorMsg = errorData.error?. message?. value || errorData.error?.message || errorMsg;
-                    } catch (e) {
-                        errorMsg = responseText || response.statusText;
+                    loadFromLocalStorage();
+                    if (state.satellites.length === 0) {
+                        state.satellites = [
+                            { ID: 1, Title: 'Landsat 8', NORAD_ID: '39084', COSPAR_ID: '2013-008A', Mission_Type: 'Earth Observation', Status: 'Operational', Orbit_Type: 'SSO', Launch_Date: '2013-02-11', Expected_Lifetime: 10, Constellation_ID: 1, Sensor_Names: 'Multispectral Imager', Primary_Sensor: 'Multispectral Imager' }
+                        ];
+                        state.nextId = 1001;
+                        saveToLocalStorage();
+                        showAlert('📊 Loaded with sample data', 'info');
+                    } else {
+                        showAlert('✅ Loaded ' + state.satellites.length + ' satellites', 'success');
                     }
-                    throw new Error(errorMsg);
-                }
-            } catch (error) {
-                Logger.error('Error saving to SharePoint:', error. message);
-                showAlert('❌ Save failed: ' + error.message, 'error');
-            }
-        }
-
-        // ============================================================================
-        // SAVE TO LOCAL STORAGE
-        // ============================================================================
-
-        function saveSatelliteToLocalStorage(formData) {
-            try {
-                const title = formData.get('Title').trim();
-                const norad = formData.get('NORAD_ID').trim();
-
-                if (state.editingId) {
-                    // Update existing
-                    const idx = state.satellites. findIndex(s => s.ID === state.editingId);
-                    if (idx !== -1) {
-                        state.satellites[idx] = {
-                            ...state.satellites[idx],
-                            Title: title,
-                            NORAD_ID: norad,
-                            COSPAR_ID:  formData.get('COSPAR_ID')?.trim() || '',
-                            Mission_Type: formData.get('Mission_Type')?.trim() || '',
-                            Status:  formData.get('Status') || 'Operational',
-                            Orbit_Type: formData.get('Orbit_Type') || '',
-                            Launch_Date:  formData.get('Launch_Date') || '',
-                            Sensor_Names: formData.get('Sensor_Names')?.trim() || ''
-                        };
-                        Logger.log('✅ Satellite updated in local storage');
-                        showAlert('✅ Satellite updated successfully!', 'success');
-                    }
-                } else {
-                    // Create new
-                    const newSatellite = {
-                        ID: state.nextId++,
-                        Title:  title,
-                        NORAD_ID: norad,
-                        COSPAR_ID: formData.get('COSPAR_ID')?.trim() || '',
-                        Mission_Type: formData.get('Mission_Type')?.trim() || '',
-                        Status:  formData.get('Status') || 'Operational',
-                        Orbit_Type: formData.get('Orbit_Type') || '',
-                        Launch_Date:  formData.get('Launch_Date') || '',
-                        Sensor_Names: formData.get('Sensor_Names')?.trim() || ''
-                    };
-                    state.satellites. push(newSatellite);
-                    Logger.log('✅ Satellite added to local storage');
-                    showAlert('✅ Satellite added successfully!', 'success');
                 }
 
-                saveToLocalStorage();
-                closeAddSatelliteModal();
-                state.editingId = null;
+                loadSensors();
+
+                // NOW attach event listeners (DOM is fully ready)
+                attachAllEventListeners();
+
+                // Initial render
                 filterAndDisplayData();
                 updateStatistics();
-            } catch (error) {
-                Logger.error('Error saving to local storage:', error.message);
-                showAlert('❌ Error: ' + error. message, 'error');
+                Logger.log('✅ Initialization complete');
+
+            } catch (e) {
+                Logger.error('Fatal initialization error', e.message);
+                showAlert('❌ Error during initialization', 'error');
             }
+        });
+
+        // ============================================================================
+        // ATTACH ALL EVENT LISTENERS AT ONCE (AFTER DOM READY)
+        // ============================================================================
+
+        function attachAllEventListeners() {
+    Logger.log('🔗 Attaching all event listeners...');
+
+    try {
+        // Search input
+        const searchInput = safeGetElement('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                state.searchTerm = e.target.value.toLowerCase();
+                filterAndDisplayData();
+            });
+            Logger.log('✅ Search listener attached');
         }
 
-        // ============================================================================
-        // FIXED:  EDIT SATELLITE FUNCTION
-        // ============================================================================
-
-        function editSatellite(id) {
-            Logger.debug('editSatellite called with ID:', id);
-            
-            const sat = state.satellites. find(s => s.ID === id);
-            if (!sat) {
-                Logger.error('Satellite not found:  ' + id);
-                showAlert('❌ Satellite not found', 'error');
-                return false;
-            }
-
-            Logger.debug('Found satellite:', sat);
-            state.editingId = id;
-
-            // Populate form fields using getElementById for reliability
-            const titleInput = safeGetElement('satellite-title');
-            const noradInput = safeGetElement('satellite-norad');
-            const cosparInput = safeGetElement('satellite-cospar');
-            const missionInput = safeGetElement('satellite-mission');
-            const statusInput = safeGetElement('satellite-status');
-            const orbitInput = safeGetElement('satellite-orbit');
-            const launchInput = safeGetElement('satellite-launch');
-            const sensorsInput = safeGetElement('satellite-sensors');
-
-            if (titleInput) titleInput.value = sat.Title || '';
-            if (noradInput) noradInput.value = sat.NORAD_ID || '';
-            if (cosparInput) cosparInput.value = sat. COSPAR_ID || '';
-            if (missionInput) missionInput.value = sat.Mission_Type || '';
-            if (statusInput) statusInput.value = sat.Status || 'Operational';
-            if (orbitInput) orbitInput.value = sat. Orbit_Type || '';
-            if (launchInput) launchInput.value = sat.Launch_Date || '';
-            if (sensorsInput) sensorsInput.value = sat.Sensor_Names || '';
-
-            const modalTitle = safeGetElement('modalTitle');
-            if (modalTitle) modalTitle.textContent = `Edit:  ${sat.Title}`;
-
-            showAddSatelliteModal();
-            Logger.log('✅ Edit form populated for ID:  ' + id);
-            return false;
+        // CSV file input
+        const csvFile = safeGetElement('csvFile');
+        if (csvFile) {
+            csvFile.addEventListener('change', handleCSVFileSelect);
+            Logger.log('✅ CSV file listener attached');
         }
 
-        // ============================================================================
-        // DELETE SATELLITE
-        // ============================================================================
+        // Import form
+        const importForm = safeGetElement('importForm');
+        if (importForm) {
+            importForm.addEventListener('submit', (e) => handleCSVImport(e));
+            Logger.log('✅ Import form listener attached');
+        }
 
-        function deleteSatellite(id) {
-            if (! confirm('Are you sure you want to delete this satellite?')) return false;
+        // CRITICAL FIX: Use event delegation for modal backdrop clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'addSatelliteModal') {
+                closeAddSatelliteModal();
+            }
+            if (e.target.id === 'importModal') {
+                closeImportModal();
+            }
+        });
 
-            if (config.inSharePoint && config.siteUrl) {
-                deleteSatelliteFromSharePoint(id);
-            } else {
-                const idx = state.satellites. findIndex(s => s.ID === id);
-                if (idx !== -1) {
-                    state.satellites.splice(idx, 1);
-                    saveToLocalStorage();
-                    state.selectedSatellite = null;
-                    filterAndDisplayData();
-                    updateStatistics();
-                    showDetailEmpty();
-                    showAlert('✅ Satellite deleted successfully', 'success');
+        // CRITICAL FIX: Attach form handler using event delegation
+        // This works even if the form doesn't exist yet
+        document.addEventListener('submit', (e) => {
+            if (e.target.id === 'satelliteForm') {
+                e.preventDefault();
+                saveSatellite(e);
+                Logger.log('📝 Form submitted via event delegation');
+            }
+        });
+        Logger.log('✅ Form handler attached via delegation');
+
+        // Document-level event delegation for edit/delete buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-btn')) {
+                e.preventDefault();
+                const id = parseInt(e.target.dataset.id);
+                if (!isNaN(id)) {
+                    Logger.log('✏️ Edit clicked for ID: ' + id);
+                    editSatellite(id);
                 }
             }
-            return false;
-        }
-
-        async function deleteSatelliteFromSharePoint(id) {
-            try {
-                const contextUrl = config.siteUrl + '/_api/contextinfo';
-                const digestResponse = await fetch(contextUrl, {
-                    method:  'POST',
-                    headers: { 'Accept': 'application/json;odata=verbose' },
-                    credentials: 'include'
-                });
-
-                if (!digestResponse. ok) throw new Error('Failed to get digest');
-
-                const digestData = await digestResponse.json();
-                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
-
-                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${id})`;
-
-                const response = await fetch(url, {
-                    method:  'POST',
-                    headers: {
-                        'Accept': 'application/json;odata=verbose',
-                        'X-RequestDigest':  digest,
-                        'X-HTTP-Method': 'DELETE',
-                        'IF-MATCH':  '*'
-                    },
-                    credentials: 'include'
-                });
-
-                if (response.ok || response.status === 204) {
-                    Logger.log('✅ Satellite deleted from SharePoint');
-                    showAlert('✅ Satellite deleted successfully', 'success');
-                    state.selectedSatellite = null;
-                    await loadSatellites();
-                    filterAndDisplayData();
-                    updateStatistics();
-                    showDetailEmpty();
-                } else {
-                    throw new Error('HTTP ' + response.status);
+            if (e.target.classList.contains('delete-btn')) {
+                e.preventDefault();
+                const id = parseInt(e.target.dataset.id);
+                if (!isNaN(id)) {
+                    Logger.log('🗑️ Delete clicked for ID: ' + id);
+                    deleteSatellite(id);
                 }
-            } catch (error) {
-                Logger.error('Error deleting satellite:', error.message);
-                showAlert('❌ Error: ' + error. message, 'error');
             }
-        }
+        });
+        Logger.log('✅ Edit/Delete listeners attached via delegation');
+
+        Logger.log('✅ All event listeners attached successfully');
+    } catch (e) {
+        Logger.error('Error attaching event listeners', e.message);
+    }
+}
+
 
         // ============================================================================
-        // DATA LOADING
+        // SHAREPOINT DATA LOADING
         // ============================================================================
 
         async function loadSatellites() {
-            if (! config.inSharePoint || !config.siteUrl) {
-                loadFromLocalStorage();
-                return;
-            }
+            if (!config.inSharePoint || !config.siteUrl) return;
 
             try {
                 const url = config.siteUrl + 
                     `/_api/web/lists/getbytitle('${config.satelliteList}')/items?$top=5000`;
 
                 const response = await fetch(url, {
-                    method:  'GET',
+                    method: 'GET',
                     headers: { 'Accept': 'application/json;odata=verbose' },
                     credentials: 'include'
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    state.satellites = data. d.results. map(item => ({
-                        ID:  item.ID,
+                    state.satellites = data.d.results.map(item => ({
+                        ID: item.ID,
                         Title: item.Title || '',
-                        NORAD_ID:  item.NORAD_ID || '',
-                        COSPAR_ID: item. COSPAR_ID || '',
+                        NORAD_ID: item.NORAD_ID || '',
+                        COSPAR_ID: item.COSPAR_ID || '',
                         Mission_Type: item.Mission_Type || '',
                         Status: item.Status || 'Operational',
-                        Orbit_Type: item. Orbit_Type || '',
-                        Launch_Date: item. Launch_Date ?  item.Launch_Date. split('T')[0] : '',
-                        Sensor_Names:  item.Sensor_Names || ''
+                        Orbit_Type: item.Orbit_Type || '',
+                        Launch_Date: item.Launch_Date ? new Date(item.Launch_Date).toISOString().split('T')[0] : '',
+                        Expected_Lifetime: item.Expected_Lifetime || '',
+                        Constellation_ID: item.Constellation_ID || '',
+                        Sensor_Names: item.Sensor_Names || '',
+                        Primary_Sensor: item.Primary_Sensor || ''
                     }));
-                    Logger.log('✅ Loaded ' + state.satellites.length + ' satellites from SharePoint');
+                    Logger.log('✅ Satellites loaded from SharePoint: ' + state.satellites.length);
+                    showAlert('✅ Loaded ' + state.satellites.length + ' satellites', 'success');
                 } else {
-                    throw new Error('HTTP ' + response.status);
+                    throw new Error(`HTTP ${response.status}`);
                 }
-            } catch (error) {
-                Logger.error('Error loading satellites:', error.message);
-                showAlert('⚠️ Error loading satellites: ' + error.message, 'warning');
-                loadFromLocalStorage();
+            } catch (e) {
+                Logger.error('Error loading satellites', e.message);
+                showAlert('❌ Error loading satellites: ' + e.message, 'error');
             }
         }
 
         async function loadSensors() {
-            if (!config.inSharePoint || !config. siteUrl) {
+            if (!config.inSharePoint || !config.siteUrl) {
+                state.sensors = [];
                 return;
             }
 
             try {
-                const url = config. siteUrl + 
+                const url = config.siteUrl + 
                     `/_api/web/lists/getbytitle('${config.sensorList}')/items?$top=5000`;
 
                 const response = await fetch(url, {
@@ -1529,176 +1255,851 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    state.sensors = data. d.results.map(item => ({
+                    state.sensors = data.d.results.map(item => ({
                         ID: item.ID,
                         Title: item.Title || '',
                         Sensor_Type: item.Sensor_Type || '',
-                        Satellites: item.Satellites || ''
+                        Description: item.Description || '',
+                        Satellite_Names: item.Satellite_Names || ''
                     }));
-                    Logger. log('✅ Loaded ' + state.sensors.length + ' sensors from SharePoint');
-                }
-            } catch (error) {
-                Logger.error('Error loading sensors:', error. message);
-            }
-        }
-
-        // ============================================================================
-        // LOCAL STORAGE
-        // ============================================================================
-
-        function saveToLocalStorage() {
-            try {
-                localStorage.setItem('satellites', JSON.stringify(state.satellites));
-                localStorage.setItem('nextId', state.nextId. toString());
-                Logger.debug('Saved to local storage');
-            } catch (e) {
-                Logger.error('Error saving to local storage:', e.message);
-            }
-        }
-
-        function loadFromLocalStorage() {
-            try {
-                const saved = localStorage.getItem('satellites');
-                if (saved) {
-                    state.satellites = JSON. parse(saved);
-                    Logger.log('✅ Loaded ' + state. satellites.length + ' satellites from local storage');
-                }
-                const nextId = localStorage.getItem('nextId');
-                if (nextId) {
-                    state.nextId = parseInt(nextId);
+                    Logger.log('✅ Sensors loaded: ' + state.sensors.length);
                 }
             } catch (e) {
-                Logger.error('Error loading from local storage:', e.message);
-                state.satellites = [];
+                Logger.error('Error loading sensors', e.message);
+                state.sensors = [];
             }
         }
 
         // ============================================================================
-        // DISPLAY FUNCTIONS
+        // FILTERING & DISPLAY
         // ============================================================================
 
         function filterAndDisplayData() {
-            // Filter satellites
-            state.filteredSatellites = state.satellites. filter(sat => {
-                const searchMatch = ! state.searchTerm || 
-                    sat. Title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-                    sat. NORAD_ID.toString().includes(state.searchTerm) ||
-                    (sat. Sensor_Names && sat. Sensor_Names. toLowerCase().includes(state.searchTerm. toLowerCase()));
-                
-                return searchMatch;
+            state.filteredSatellites = state.satellites.filter(sat => {
+                const match = !state.searchTerm ||
+                    (sat.Title && sat.Title.toLowerCase().includes(state.searchTerm)) ||
+                    (sat.NORAD_ID && sat.NORAD_ID.toString().includes(state.searchTerm));
+
+                if (state.currentFilter === 'sat-operational') return match && sat.Status === 'Operational';
+                if (state.currentFilter === 'sat-leo') return match && sat.Orbit_Type === 'LEO';
+                if (state.currentFilter === 'sat-geo') return match && sat.Orbit_Type === 'GEO';
+                return match;
             });
 
-            // Filter sensors
-            state.filteredSensors = state. sensors.filter(sen => {
-                return ! state.searchTerm || 
-                    sen.Title.toLowerCase().includes(state.searchTerm.toLowerCase());
+            state.filteredSensors = state.sensors.filter(sen => {
+                const match = !state.searchTerm ||
+                    (sen.Title && sen.Title.toLowerCase().includes(state.searchTerm));
+
+                if (state.currentFilter === 'sen-eo') return match && sen.Sensor_Type === 'EO';
+                if (state.currentFilter === 'sen-ir') return match && sen.Sensor_Type === 'IR';
+                if (state.currentFilter === 'sen-sar') return match && sen.Sensor_Type === 'SAR';
+                return match;
             });
 
-            // Sort
-            state.filteredSatellites.sort((a, b) => {
-                const aVal = a[state.sortColumn] || '';
-                const bVal = b[state.sortColumn] || '';
-                const comparison = aVal.toString().localeCompare(bVal.toString(), undefined, {numeric: true});
-                return state.sortDirection === 'asc' ?  comparison : -comparison;
-            });
+            renderSatelliteTable();
+            renderSensorTable();
 
-            displaySatellites();
-            displaySensors();
+            const satCountEl = safeGetElement('satelliteCount');
+            const senCountEl = safeGetElement('sensorCount');
+            if (satCountEl) satCountEl.textContent = state.filteredSatellites.length;
+            if (senCountEl) senCountEl.textContent = state.filteredSensors.length;
         }
 
-        function displaySatellites() {
+        function renderSatelliteTable() {
             const tbody = safeGetElement('satelliteTableBody');
             if (!tbody) return;
 
-            const count = safeGetElement('satelliteCount');
-            if (count) count.textContent = state.filteredSatellites.length;
-
-            if (state.filteredSatellites. length === 0) {
-                tbody. innerHTML = `
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <div class="empty-state-icon">🛰️</div>
-                            <p>No satellites found</p>
-                        </td>
-                    </tr>
-                `;
+            if (state.filteredSatellites.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No satellites found</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = state.filteredSatellites.map(sat => {
-                const statusClass = sat.Status === 'Operational' ? 'badge-operational' : 
-                                   sat.Status === 'Non-operational' ? 'badge-decommissioned' :  'badge-testing';
-                return `
-                    <tr onclick="selectSatellite(${sat.ID})" class="${state.selectedSatellite?.ID === sat.ID ? 'selected' : ''}">
-                        <td>${escapeHtml(sat.Title)}</td>
-                        <td>${escapeHtml(sat. NORAD_ID)}</td>
-                        <td><span class="badge ${statusClass}">${escapeHtml(sat.Status)}</span></td>
-                        <td>${escapeHtml(sat.Orbit_Type) || '-'}</td>
-                        <td style="text-align: center;">
-                            <div class="action-buttons">
-                                <button type="button" class="btn btn-small btn-secondary action-btn" onclick="event.stopPropagation(); editSatellite(${sat.ID}); return false;">Edit</button>
-                                <button type="button" class="btn btn-small btn-secondary action-btn" onclick="event.stopPropagation(); deleteSatellite(${sat.ID}); return false;">Del</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function displaySensors() {
-            const tbody = safeGetElement('sensorTableBody');
-            if (!tbody) return;
-
-            const count = safeGetElement('sensorCount');
-            if (count) count.textContent = state.filteredSensors.length;
-
-            if (state.filteredSensors.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="empty-state">
-                            <div class="empty-state-icon">📡</div>
-                            <p>No sensors found</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = state.filteredSensors.map(sen => `
-                <tr onclick="selectSensor(${sen.ID})" class="${state.selectedSensor?.ID === sen.ID ?  'selected' :  ''}">
-                    <td>${escapeHtml(sen.Title)}</td>
-                    <td>${escapeHtml(sen. Sensor_Type) || '-'}</td>
-                    <td>${escapeHtml(sen. Satellites) || '-'}</td>
+            tbody.innerHTML = state.filteredSatellites.map(sat => `
+                <tr onclick="selectSatellite(${sat.ID})" class="${state.selectedSatellite?.ID === sat.ID ? 'selected' : ''}">
+                    <td><strong>${escapeHtml(sat.Title)}</strong></td>
+                    <td>${escapeHtml(sat.NORAD_ID)}</td>
+                    <td><span class="badge badge-operational">${escapeHtml(sat.Status)}</span></td>
+                    <td>${escapeHtml(sat.Orbit_Type)}</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-small btn-secondary edit-btn" data-id="${sat.ID}" title="Edit">✏️</button>
+                        <button class="btn btn-small btn-secondary delete-btn" data-id="${sat.ID}" title="Delete">🗑️</button>
+                    </td>
                 </tr>
             `).join('');
         }
 
-        function selectSatellite(id) {
-            state.selectedSatellite = state.satellites.find(s => s.ID === id);
-            state.selectedSensor = null;
-            showSatelliteDetails(state.selectedSatellite);
-            displaySatellites();
-            displaySensors();
-        }
+        function renderSensorTable() {
+            const tbody = safeGetElement('sensorTableBody');
+            if (!tbody) return;
 
-        function selectSensor(id) {
-            state.selectedSensor = state.sensors. find(s => s.ID === id);
-            state.selectedSatellite = null;
-            showSensorDetails(state.selectedSensor);
-            displaySatellites();
-            displaySensors();
-        }
-
-        function showSatelliteDetails(sat) {
-            if (!sat) {
-                showDetailEmpty();
+            if (state.filteredSensors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #999;">No sensors found</td></tr>';
                 return;
             }
 
-            const sensors = sat.Sensor_Names ?  sat.Sensor_Names.split(',').map(s => s.trim()).filter(s => s) : [];
-            
+            tbody.innerHTML = state.filteredSensors.map(sen => `
+                <tr onclick="selectSensor(${sen.ID})" class="${state.selectedSensor?.ID === sen.ID ? 'selected' : ''}">
+                    <td><strong>${escapeHtml(sen.Title)}</strong></td>
+                    <td>${escapeHtml(sen.Sensor_Type)}</td>
+                    <td>${(sen.Satellite_Names || '').split(',').filter(s => s.trim()).length}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================================
+        // DETAIL VIEWS
+        // ============================================================================
+
+        function selectSatellite(id) {
+            const sat = state.satellites.find(s => s.ID === id);
+            if (!sat) return;
+
+            state.selectedSatellite = sat;
+            state.selectedSensor = null;
+            renderSatelliteDetail();
+            filterAndDisplayData();
+        }
+
+        function selectSensor(id) {
+            const sen = state.sensors.find(s => s.ID === id);
+            if (!sen) return;
+
+            state.selectedSensor = sen;
+            state.selectedSatellite = null;
+            renderSensorDetail();
+            filterAndDisplayData();
+        }
+
+        function renderSatelliteDetail() {
+            const sat = state.selectedSatellite;
+            const sensors = (sat.Sensor_Names || '').split(',').map(s => s.trim()).filter(s => s);
+
             const html = `
                 <div class="detail-view">
+                    <div class="detail-row"><div class="detail-label">Name</div><div class="detail-value">${escapeHtml(sat.Title)}</div></div>
                     <div class="detail-row"><div class="detail-label">NORAD ID</div><div class="detail-value">${escapeHtml(sat.NORAD_ID)}</div></div>
                     <div class="detail-row"><div class="detail-label">COSPAR ID</div><div class="detail-value">${escapeHtml(sat.COSPAR_ID) || 'N/A'}</div></div>
-                    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-
+                    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="badge badge-operational">${escapeHtml(sat.Status)}</span></div></div>
+                    <div class="detail-row"><div class="detail-label">Mission</div><div class="detail-value">${escapeHtml(sat.Mission_Type) || 'N/A'}</div></div>
+                    <div class="detail-row"><div class="detail-label">Orbit</div><div class="detail-value">${escapeHtml(sat.Orbit_Type) || 'N/A'}</div></div>
+                    <div class="detail-row"><div class="detail-label">Launch</div><div class="detail-value">${escapeHtml(sat.Launch_Date) || 'N/A'}</div></div>
+                </div>
+            `;
+
+            const title = safeGetElement('detailTitle');
+            const content = safeGetElement('detailContent');
+            const actions = safeGetElement('detailActions');
+
+            if (title) title.textContent = `Satellite: ${sat.Title}`;
+            if (content) content.innerHTML = html;
+            if (actions) actions.innerHTML = `
+                <button type="button" class="btn btn-small btn-secondary" onclick="editSatellite(${sat.ID}); return false;">Edit</button>
+                <button type="button" class="btn btn-small btn-secondary" onclick="deleteSatellite(${sat.ID}); return false;">Delete</button>
+            `;
+        }
+
+        function renderSensorDetail() {
+            const sen = state.selectedSensor;
+            const html = `
+                <div class="detail-view">
+                    <div class="detail-row"><div class="detail-label">Name</div><div class="detail-value">${escapeHtml(sen.Title)}</div></div>
+                    <div class="detail-row"><div class="detail-label">Type</div><div class="detail-value">${escapeHtml(sen.Sensor_Type) || 'N/A'}</div></div>
+                    <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(sen.Description) || 'N/A'}</div></div>
+                </div>
+            `;
+
+            const title = safeGetElement('detailTitle');
+            const content = safeGetElement('detailContent');
+            const actions = safeGetElement('detailActions');
+
+            if (title) title.textContent = `Sensor: ${sen.Title}`;
+            if (content) content.innerHTML = html;
+            if (actions) actions.innerHTML = '';
+        }
+
+        // ============================================================================
+        // CRUD OPERATIONS
+        // ============================================================================
+
+        function showAddSatelliteModal() {
+            clearValidationErrors();
+            const form = safeGetElement('satelliteForm');
+            if (form) form.reset();
+            
+            const title = safeGetElement('modalTitle');
+            if (title) title.textContent = 'Add New Satellite';
+            
+            state.editingId = null;
+            const modal = safeGetElement('addSatelliteModal');
+            if (modal) modal.classList.add('active');
+            return false;
+        }
+
+        function closeAddSatelliteModal() {
+    const modal = safeGetElement('addSatelliteModal');
+    if (modal) modal.classList.remove('active');
+    
+    const form = safeGetElement('satelliteForm');
+    if (form) form.reset();
+    
+    clearValidationErrors();
+    state.editingId = null;
+    
+    // Re-enable body scroll
+    document.body.style.overflow = '';
+    
+    return false;
+}
+
+function showAddSatelliteModal() {
+    clearValidationErrors();
+    const form = safeGetElement('satelliteForm');
+    if (form) form.reset();
+    
+    const title = safeGetElement('modalTitle');
+    if (title) title.textContent = 'Add New Satellite';
+    
+    state.editingId = null;
+    const modal = safeGetElement('addSatelliteModal');
+    if (modal) {
+        modal.classList.add('active');
+        
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+        
+        // Focus first input field
+        setTimeout(() => {
+            const firstInput = safeGetElement('satellite-title');
+            if (firstInput) firstInput.focus();
+        }, 100);
+    }
+    return false;
+}
+
+        function handleModalBackdropClick(event) {
+            if (event.target.id === 'addSatelliteModal') closeAddSatelliteModal();
+            return false;
+        }
+
+        function handleImportModalBackdropClick(event) {
+            if (event.target.id === 'importModal') closeImportModal();
+            return false;
+        }
+
+        function clearValidationErrors() {
+            document.querySelectorAll('.validation-error').forEach(el => el.textContent = '');
+            document.querySelectorAll('.form-group input, .form-group textarea, .form-group select').forEach(el => el.classList.remove('error'));
+        }
+
+       function saveSatellite(event) {
+    event.preventDefault();
+    Logger.debug('saveSatellite called');
+    clearValidationErrors();
+
+    try {
+        const titleInput = safeGetElement('satellite-title');
+        const noradInput = safeGetElement('satellite-norad');
+
+        let isValid = true;
+
+        // Validate Title
+        if (!titleInput || !titleInput.value.trim()) {
+            showValidationError('title', 'Satellite Name is required');
+            isValid = false;
+        }
+
+        // Validate NORAD ID
+        if (!noradInput || !noradInput.value.trim()) {
+            showValidationError('norad', 'NORAD ID is required');
+            isValid = false;
+        } else if (isNaN(parseInt(noradInput.value))) {
+            showValidationError('norad', 'NORAD ID must be a number');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Logger.warn('Validation failed');
+            showAlert('❌ Please fix validation errors', 'error');
+            return false;
+        }
+
+        Logger.log('📝 Saving satellite...');
+
+        const form = safeGetElement('satelliteForm');
+        if (!form) {
+            showAlert('❌ Form not found', 'error');
+            return false;
+        }
+
+        const formData = new FormData(form);
+        Logger.debug('Form data collected', { title: formData.get('Title'), norad: formData.get('NORAD_ID') });
+
+        if (config.inSharePoint && config.siteUrl) {
+            Logger.log('Saving to SharePoint...');
+            saveSatelliteToSharePoint(formData);
+        } else {
+            Logger.log('Saving to Local Storage...');
+            saveSatelliteToLocalStorage(formData);
+        }
+
+        return false;
+    } catch (error) {
+        Logger.error('Error in saveSatellite:', error.message);
+        showAlert('❌ Error: ' + error.message, 'error');
+        return false;
+    }
+}
+
+
+        async function saveSatelliteToSharePoint(formData) {
+    try {
+        Logger.log('Getting request digest...');
+        
+        // Get request digest
+        const contextUrl = config.siteUrl + '/_api/contextinfo';
+        const digestResponse = await fetch(contextUrl, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json;odata=verbose' },
+            credentials: 'include'
+        });
+
+        if (!digestResponse.ok) {
+            throw new Error('Failed to get request digest: HTTP ' + digestResponse.status);
+        }
+
+        const digestData = await digestResponse.json();
+        const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+        // Build payload with correct data types
+        const payload = {
+            '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
+            'Title': formData.get('Title').trim(),
+            'NORAD_ID': parseInt(formData.get('NORAD_ID').trim()) || 0,
+            'COSPAR_ID': formData.get('COSPAR_ID')?.trim() || '',
+            'Mission_Type': formData.get('Mission_Type')?.trim() || '',
+            'Status': formData.get('Status') || 'Operational',
+            'Orbit_Type': formData.get('Orbit_Type') || '',
+            'Launch_Date': formData.get('Launch_Date') ? new Date(formData.get('Launch_Date')).toISOString() : null,
+            'Sensor_Names': formData.get('Sensor_Names')?.trim() || ''
+        };
+
+        let url, method, headers;
+
+        if (state.editingId) {
+            // UPDATE existing satellite
+            url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${state.editingId})`;
+            method = 'POST';
+            headers = {
+                'Accept': 'application/json;odata=verbose',
+                'Content-Type': 'application/json;odata=verbose',
+                'X-RequestDigest': digest,
+                'X-HTTP-Method': 'MERGE',
+                'IF-MATCH': '*'
+            };
+        } else {
+            // CREATE new satellite
+            url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items`;
+            method = 'POST';
+            headers = {
+                'Accept': 'application/json;odata=verbose',
+                'Content-Type': 'application/json;odata=verbose',
+                'X-RequestDigest': digest
+            };
+        }
+
+        const response = await fetch(url, {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        });
+
+        if (response.ok || response.status === 201 || response.status === 204) {
+            const action = state.editingId ? 'updated' : 'added';
+            Logger.log(`✅ Satellite ${action} successfully`);
+            showAlert(`✅ Satellite ${action} successfully!`, 'success');
+            
+            closeAddSatelliteModal();
+            state.editingId = null;
+            
+            await loadSatellites();
+            filterAndDisplayData();
+            updateStatistics();
+        } else {
+            const responseText = await response.text();
+            let errorMsg = `HTTP ${response.status}`;
+            try {
+                const errorData = JSON.parse(responseText);
+                errorMsg = errorData.error?.message?.value || errorData.error?.message || errorMsg;
+            } catch (e) {
+                errorMsg = responseText || response.statusText;
+            }
+            throw new Error(errorMsg);
+        }
+    } catch (error) {
+        Logger.error('Error saving to SharePoint:', error.message);
+        showAlert('❌ Save failed: ' + error.message, 'error');
+    }
+}
+
+
+        function saveSatelliteToLocalStorage(formData) {
+            const title = formData.get('Title').trim();
+            const norad = formData.get('NORAD_ID').trim();
+
+            if (state.editingId) {
+                const idx = state.satellites.findIndex(s => s.ID === state.editingId);
+                if (idx !== -1) {
+                    state.satellites[idx] = {
+                        ...state.satellites[idx],
+                        Title: title,
+                        NORAD_ID: norad,
+                        COSPAR_ID: formData.get('COSPAR_ID')?.trim() || '',
+                        Mission_Type: formData.get('Mission_Type')?.trim() || '',
+                        Status: formData.get('Status') || 'Operational',
+                        Orbit_Type: formData.get('Orbit_Type') || '',
+                        Launch_Date: formData.get('Launch_Date') || '',
+                        Sensor_Names: formData.get('Sensor_Names')?.trim() || ''
+                    };
+                }
+            } else {
+                state.satellites.push({
+                    ID: state.nextId++,
+                    Title: title,
+                    NORAD_ID: norad,
+                    COSPAR_ID: formData.get('COSPAR_ID')?.trim() || '',
+                    Mission_Type: formData.get('Mission_Type')?.trim() || '',
+                    Status: formData.get('Status') || 'Operational',
+                    Orbit_Type: formData.get('Orbit_Type') || '',
+                    Launch_Date: formData.get('Launch_Date') || '',
+                    Expected_Lifetime: '',
+                    Constellation_ID: 1,
+                    Sensor_Names: formData.get('Sensor_Names')?.trim() || '',
+                    Primary_Sensor: ''
+                });
+            }
+
+            saveToLocalStorage();
+            showAlert('✅ Saved!', 'success');
+            closeAddSatelliteModal();
+            filterAndDisplayData();
+            updateStatistics();
+        }
+
+        function showValidationError(field, msg) {
+            const err = safeGetElement(`error-${field}`);
+            const inp = safeGetElement(`satellite-${field}`);
+            if (err) err.textContent = msg;
+            if (inp) inp.classList.add('error');
+        }
+
+        function editSatellite(id) {
+    Logger.debug('editSatellite called with ID:', id);
+    
+    const sat = state.satellites.find(s => s.ID === id);
+    if (!sat) {
+        Logger.error('Satellite not found: ' + id);
+        showAlert('❌ Satellite not found', 'error');
+        return false;
+    }
+
+    Logger.debug('Found satellite:', sat);
+    state.editingId = id;
+
+    // Populate form fields
+    const titleInput = safeGetElement('satellite-title');
+    const noradInput = safeGetElement('satellite-norad');
+    const cosparInput = safeGetElement('satellite-cospar');
+    const missionInput = safeGetElement('satellite-mission');
+    const statusInput = safeGetElement('satellite-status');
+    const orbitInput = safeGetElement('satellite-orbit');
+    const launchInput = safeGetElement('satellite-launch');
+    const sensorsInput = safeGetElement('satellite-sensors');
+
+    if (titleInput) titleInput.value = sat.Title || '';
+    if (noradInput) noradInput.value = sat.NORAD_ID || '';
+    if (cosparInput) cosparInput.value = sat.COSPAR_ID || '';
+    if (missionInput) missionInput.value = sat.Mission_Type || '';
+    if (statusInput) statusInput.value = sat.Status || 'Operational';
+    if (orbitInput) orbitInput.value = sat.Orbit_Type || '';
+    if (launchInput) launchInput.value = sat.Launch_Date || '';
+    if (sensorsInput) sensorsInput.value = sat.Sensor_Names || '';
+
+    const modalTitle = safeGetElement('modalTitle');
+    if (modalTitle) modalTitle.textContent = `Edit: ${sat.Title}`;
+
+    showAddSatelliteModal();
+    Logger.log('✅ Edit form populated for ID: ' + id);
+    return false;
+}
+
+
+        function deleteSatellite(id) {
+            if (!confirm('Delete this satellite?')) return false;
+
+            if (config.inSharePoint && config.siteUrl) {
+                deleteSatelliteFromSharePoint(id);
+            } else {
+                const idx = state.satellites.findIndex(s => s.ID === id);
+                if (idx !== -1) {
+                    state.satellites.splice(idx, 1);
+                    saveToLocalStorage();
+                    state.selectedSatellite = null;
+                    filterAndDisplayData();
+                    updateStatistics();
+                    showAlert('✅ Deleted', 'success');
+                }
+            }
+            return false;
+        }
+
+        async function deleteSatelliteFromSharePoint(id) {
+            try {
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include'
+                });
+
+                if (!digestResponse.ok) throw new Error('Failed to get digest');
+
+                const digestData = await digestResponse.json();
+                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${id})`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-RequestDigest': digest,
+                        'X-HTTP-Method': 'DELETE',
+                        'IF-MATCH': '*'
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok || response.status === 204) {
+                    showAlert('✅ Deleted', 'success');
+                    await loadSatellites();
+                    filterAndDisplayData();
+                    updateStatistics();
+                }
+            } catch (e) {
+                Logger.error('Error deleting', e.message);
+                showAlert('❌ Error: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================================
+        // CSV IMPORT
+        // ============================================================================
+
+        function showImportModal() {
+            const modal = safeGetElement('importModal');
+            if (modal) modal.classList.add('active');
+            return false;
+        }
+
+        function closeImportModal() {
+            const modal = safeGetElement('importModal');
+            if (modal) modal.classList.remove('active');
+            const file = safeGetElement('csvFile');
+            if (file) file.value = '';
+            return false;
+        }
+
+        function handleCSVFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    state.csvPreviewData = parseCSV(e.target.result);
+                    if (state.csvPreviewData.length === 0) {
+                        showAlert('❌ No data in CSV', 'error');
+                        return;
+                    }
+                    displayCSVPreview(state.csvPreviewData);
+                } catch (err) {
+                    Logger.error('CSV parsing error', err.message);
+                    showAlert('❌ Error parsing CSV', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            if (lines.length < 2) return [];
+
+            const headers = parseCSVLine(lines[0]);
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const values = parseCSVLine(lines[i]);
+                const row = {};
+                headers.forEach((h, idx) => {
+                    row[h.trim()] = values[idx] ? values[idx].trim() : '';
+                });
+                data.push(row);
+            }
+            return data;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                const next = line[i + 1];
+
+                if (ch === '"') {
+                    if (inQuotes && next === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (ch === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            result.push(current);
+            return result;
+        }
+
+        function displayCSVPreview(data) {
+            const preview = safeGetElement('importPreview');
+            if (!preview) return;
+
+            let html = '<table><thead><tr>';
+            if (data.length > 0) {
+                Object.keys(data[0]).forEach(k => {
+                    html += `<th>${escapeHtml(k)}</th>`;
+                });
+            }
+            html += '</tr></thead><tbody>';
+
+            data.slice(0, 5).forEach(row => {
+                html += '<tr>';
+                Object.values(row).forEach(v => {
+                    html += `<td>${escapeHtml(v)}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            if (data.length > 5) html += `<p>... and ${data.length - 5} more rows</p>`;
+
+            preview.innerHTML = html;
+            preview.style.display = 'block';
+        }
+
+        function handleCSVImport(event) {
+            event.preventDefault();
+
+            if (state.csvPreviewData.length === 0) {
+                showAlert('❌ No data to import', 'error');
+                return false;
+            }
+
+            if (config.inSharePoint && config.siteUrl) {
+                importCSVToSharePoint();
+            } else {
+                importCSVToLocalStorage();
+            }
+
+            return false;
+        }
+
+        async function importCSVToSharePoint() {
+            let success = 0;
+            try {
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include'
+                });
+
+                if (!digestResponse.ok) throw new Error('Failed to get digest');
+
+                const digestData = await digestResponse.json();
+                const digest = digestData.d.GetContextWebInformation.FormDigestValue;
+
+                for (const row of state.csvPreviewData) {
+                    try {
+                        const payload = {
+                            '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
+                            'Title': row['Title'] || '',
+                            'NORAD_ID': row['NORAD_ID'] || '',
+                            'COSPAR_ID': row['COSPAR_ID'] || '',
+                            'Mission_Type': row['Mission_Type'] || '',
+                            'Status': row['Status'] || 'Operational',
+                            'Orbit_Type': row['Orbit_Type'] || '',
+                            'Launch_Date': row['Launch_Date'] ? new Date(row['Launch_Date']).toISOString() : null,
+                            'Sensor_Names': row['Sensor_Names'] || ''
+                        };
+
+                        const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items`;
+
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json;odata=verbose',
+                                'Content-Type': 'application/json;odata=verbose',
+                                'X-RequestDigest': digest
+                            },
+                            body: JSON.stringify(payload),
+                            credentials: 'include'
+                        });
+
+                        if (response.ok || response.status === 201) success++;
+                    } catch (e) {
+                        Logger.warn('Failed to import row');
+                    }
+                }
+
+                showAlert(`✅ Imported ${success} satellites`, 'success');
+                closeImportModal();
+                await loadSatellites();
+                filterAndDisplayData();
+            } catch (e) {
+                Logger.error('CSV import error', e.message);
+                showAlert('❌ Error: ' + e.message, 'error');
+            }
+        }
+
+        function importCSVToLocalStorage() {
+            let success = 0;
+            for (const row of state.csvPreviewData) {
+                try {
+                    state.satellites.push({
+                        ID: state.nextId++,
+                        Title: row['Title'] || '',
+                        NORAD_ID: row['NORAD_ID'] || '',
+                        COSPAR_ID: row['COSPAR_ID'] || '',
+                        Mission_Type: row['Mission_Type'] || '',
+                        Status: row['Status'] || 'Operational',
+                        Orbit_Type: row['Orbit_Type'] || '',
+                        Launch_Date: row['Launch_Date'] || '',
+                        Expected_Lifetime: '',
+                        Constellation_ID: 1,
+                        Sensor_Names: row['Sensor_Names'] || '',
+                        Primary_Sensor: ''
+                    });
+                    success++;
+                } catch (e) {
+                    Logger.warn('Error importing row');
+                }
+            }
+            saveToLocalStorage();
+            showAlert(`✅ Imported ${success} satellites`, 'success');
+            closeImportModal();
+            filterAndDisplayData();
+            updateStatistics();
+        }
+
+        // ============================================================================
+        // UTILITIES
+        // ============================================================================
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return (text || '').toString().replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function updateStatistics() {
+            const op = state.satellites.filter(s => s.Status === 'Operational').length;
+            const cons = new Set(state.satellites.map(s => s.Constellation_ID)).size;
+
+            const els = ['statSatellites', 'statSensors', 'statOperational', 'statConstellations'];
+            const vals = [state.satellites.length, state.sensors.length, op, cons];
+            els.forEach((id, idx) => {
+                const el = safeGetElement(id);
+                if (el) el.textContent = vals[idx];
+            });
+        }
+
+        function sortTable(type, col) {
+            if (state.sortColumn === col) {
+                state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortColumn = col;
+                state.sortDirection = 'asc';
+            }
+            filterAndDisplayData();
+        }
+
+        function switchTab(type, tab) {
+            state.currentFilter = tab;
+            filterAndDisplayData();
+            return false;
+        }
+
+        function showAlert(msg, type = 'info') {
+            const container = safeGetElement('alertContainer');
+            if (!container) return;
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `<span>${escapeHtml(msg)}</span>`;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function exportToCSV() {
+            const data = state.filteredSatellites.map(s => ({
+                Title: s.Title,
+                NORAD_ID: s.NORAD_ID,
+                COSPAR_ID: s.COSPAR_ID,
+                Mission_Type: s.Mission_Type,
+                Status: s.Status,
+                Orbit_Type: s.Orbit_Type,
+                Launch_Date: s.Launch_Date,
+                Sensor_Names: s.Sensor_Names
+            }));
+
+            if (data.length === 0) {
+                showAlert('No data to export', 'error');
+                return false;
+            }
+
+            const csv = [
+                Object.keys(data[0]).join(','),
+                ...data.map(r => Object.values(r).map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'satellites.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return false;
+        }
+
+// Temporary debug helper
+window.debugSatelliteForm = function() {
+    console.log('=== Form Debug Info ===');
+    console.log('EditingId:', state.editingId);
+    console.log('Title:', safeGetElement('satellite-title')?.value);
+    console.log('NORAD:', safeGetElement('satellite-norad')?.value);
+    console.log('Status:', safeGetElement('satellite-status')?.value);
+    console.log('Form element:', safeGetElement('satelliteForm'));
+    console.log('Modal visible:', safeGetElement('addSatelliteModal')?.classList.contains('active'));
+};
+
+    </script>
+</body>
+</html>
