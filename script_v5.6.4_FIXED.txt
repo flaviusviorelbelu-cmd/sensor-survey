@@ -239,14 +239,14 @@ CHANGELOG v5.6.4:
 
     <script>
 // ============================================================================
-// SATELLITE SENSOR SURVEY v5.6.2 - UX IMPROVEMENTS
+// SATELLITE SENSOR SURVEY v5.6.4 - UI/UX IMPROVEMENTS
 // ============================================================================
-// CHANGELOG v5.6.2:
-// - Fixed sensor tab filtering (All, EO, IR, SAR now work correctly)
-// - Added pagination for satellite and sensor tables (25 items per page)
-// - Limited satellites shown in sensor detail view (10 + "Show more")
-// - Added sort dropdown for both tables (Name, NORAD ID, Status, Launch Date)
-// - Improved state management for filters and sorting
+// CHANGELOG v5.6.4:
+// - Removed: Description column from Sensor table for a cleaner view
+// - Improved: Sensor table column widths adjusted (30%/20%/50%)
+// - Improved: Keyboard accessibility - ESC key closes modals
+// - Improved: Better empty state messages
+// - Fixed: Consistent table styling across satellite and sensor tables
 // ============================================================================
 
 // ============================================================================
@@ -1608,7 +1608,7 @@ window.changePage = changePage;
 window.handleSort = handleSort;
 window.showAllSensorSatellites = showAllSensorSatellites;
 window.hideAllSensorSatellites = hideAllSensorSatellites;
-console.log('✅ Satellite Sensor Survey v5.6.2 loaded and ready');
+console.log('✅ Satellite Sensor Survey v5.6.4 loaded and ready');
 
 </script>
 </body>
