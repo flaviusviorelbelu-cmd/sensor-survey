@@ -539,7 +539,7 @@ const Logger = {
     error: function(msg, data) { this.log(this.levels.ERROR, msg, data); }
 };
 
-Logger.info('🚀 Initializing Satellite Sensor Survey v5.6.1');
+Logger.info('🚀 Initializing Satellite Sensor Survey v5.6.4');
 Logger.info('SharePoint Mode:', config.inSharePoint ? 'YES' : 'NO');
 
 // Initialize form handler
