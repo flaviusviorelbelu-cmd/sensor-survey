@@ -360,6 +360,7 @@
             font-weight: 600;
             margin-right: 5px;
             margin-bottom: 5px;
+            cursor: pointer;
         }
 
         .no-data {
@@ -379,6 +380,60 @@
             font-weight: 600;
             margin-left: 4px;
         }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            border-color: var(--color-success);
+            color: var(--color-success);
+        }
+
+        .alert-error {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .alert-info {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
     </style>
 </head>
 <body>
@@ -387,7 +442,7 @@
         <div class="sidebar">
             <div class="header">
                 <h1>🛰️ Explorer</h1>
-                <p>Satellites & Sensors</p>
+                <p id="connectionStatus">Loading...</p>
                 <div class="version-badge">v5.7.0</div>
             </div>
 
@@ -405,7 +460,10 @@
             </div>
 
             <div class="list-container" id="listContainer">
-                <!-- Items will be populated here -->
+                <div class="empty-state">
+                    <div class="loading"></div>
+                    <p style="margin-top: 10px;">Loading data...</p>
+                </div>
             </div>
         </div>
 
@@ -429,240 +487,279 @@
         </div>
     </div>
 
+    <div id="alertContainer"></div>
+
     <script>
         /**
          * SATELLITE SENSOR EXPLORER v5.7.0
+         * Modern UI with SharePoint REST API integration
          * 
-         * Data Model:
-         * - satellites: Array of satellite objects with norad_id as key
-         * - sensors: Array of sensor objects with sensor_id as key
-         * - satellite_sensor_links: Array of {norad_id, sensor_id} link objects
+         * Data Sources:
+         * - SharePoint List: Satellite_Fixed (Title, NORAD_ID, COSPAR_ID, Status, Mission_Type, Orbit_Type, Launch_Date, Sensor_Names)
+         * - SharePoint List: Sensor (Title, Sensor_Type, Description, N_of_Bands, Resolution_Min_m, Resolution_Max_m, Swath_Min_km, Swath_Max_km, Satellite_Names)
          * 
-         * This normalized structure allows:
-         * - Clean many-to-many relationships
-         * - Easy CSV import/export from satellite_sensor tab
-         * - Bi-directional navigation (sat->sensors, sensor->sats)
+         * Normalized Model:
+         * - satellite_sensor_links: Built dynamically from Sensor_Names field in satellites
          */
 
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+
+        const config = {
+            satelliteList: 'Satellite_Fixed',
+            sensorList: 'Sensor',
+            inSharePoint: typeof _spPageContextInfo !== 'undefined' && _spPageContextInfo?.webAbsoluteUrl,
+            siteUrl: typeof _spPageContextInfo !== 'undefined' ? _spPageContextInfo.webAbsoluteUrl : '',
+            apiTimeout: 30000
+        };
+
+        // ============================================================
+        // STATE
+        // ============================================================
+
         const data = {
-            satellites: [
-                {
-                    norad_id: 42760,
-                    name: "NUSAT-3",
-                    cospar_id: "2017-040A",
-                    constellation: "ALEPH-1",
-                    mission: "Earth Observation",
-                    orbit_type: "SSO",
-                    status: "Operational",
-                    launch_date: "2017-06-15"
-                },
-                {
-                    norad_id: 52171,
-                    name: "NUSAT-25 (MARIA TELKES)",
-                    cospar_id: "2022-024A",
-                    constellation: "ALEPH-1",
-                    mission: "Earth Observation",
-                    orbit_type: "SSO",
-                    status: "Operational",
-                    launch_date: "2022-04-01"
-                },
-                {
-                    norad_id: 52184,
-                    name: "NUSAT-26 (M SOMERVILLE)",
-                    cospar_id: "2022-024K",
-                    constellation: "ALEPH-1",
-                    mission: "Earth Observation",
-                    orbit_type: "SSO",
-                    status: "Operational",
-                    launch_date: "2022-04-01"
-                },
-                {
-                    norad_id: 43812,
-                    name: "GLOBAL-2",
-                    cospar_id: "2018-102A",
-                    constellation: "BLACKSKY",
-                    mission: "Earth Observation",
-                    orbit_type: "LEO",
-                    status: "Operational",
-                    launch_date: "2018-12-03"
-                },
-                {
-                    norad_id: 44499,
-                    name: "GLOBAL-4",
-                    cospar_id: "2019-056A",
-                    constellation: "BLACKSKY",
-                    mission: "Earth Observation",
-                    orbit_type: "LEO",
-                    status: "Operational",
-                    launch_date: "2019-08-19"
-                },
-                {
-                    norad_id: 27424,
-                    name: "AQUA",
-                    cospar_id: "2002-022A",
-                    constellation: "Multi-Mission",
-                    mission: "METOC",
-                    orbit_type: "SSO",
-                    status: "Operational",
-                    launch_date: "2002-05-04"
-                },
-                {
-                    norad_id: 25994,
-                    name: "TERRA",
-                    cospar_id: "1999-071A",
-                    constellation: "Multi-Mission",
-                    mission: "METOC",
-                    orbit_type: "SSO",
-                    status: "Operational",
-                    launch_date: "1999-12-18"
-                }
-            ],
-            sensors: [
-                {
-                    sensor_id: 1,
-                    name: "SAR-C (GF-3)",
-                    type: "SAR",
-                    description: "Synthetic Aperture Radar - X-band for high-resolution imaging",
-                    bands: 1,
-                    resolution_min: 5,
-                    resolution_max: 100,
-                    swath_min: 50,
-                    swath_max: 400
-                },
-                {
-                    sensor_id: 4,
-                    name: "ABI",
-                    type: "Multispectral",
-                    description: "Advanced Baseline Imager",
-                    bands: 16,
-                    resolution_min: 500,
-                    resolution_max: 2000,
-                    swath_min: 2800,
-                    swath_max: 2800
-                },
-                {
-                    sensor_id: 11,
-                    name: "AIRS",
-                    type: "Infrared",
-                    description: "Atmospheric Infrared Sounder",
-                    bands: 7,
-                    resolution_min: 13500,
-                    resolution_max: 13500,
-                    swath_min: "N/A",
-                    swath_max: "N/A"
-                },
-                {
-                    sensor_id: 26,
-                    name: "AMSR-E",
-                    type: "Microwave",
-                    description: "Advanced Microwave Scanning Radiometer",
-                    bands: 6,
-                    resolution_min: 5000,
-                    resolution_max: 56000,
-                    swath_min: 1450,
-                    swath_max: 1450
-                },
-                {
-                    sensor_id: 27,
-                    name: "AMSU-A",
-                    type: "Microwave",
-                    description: "Advanced Microwave Sounding Unit",
-                    bands: 15,
-                    resolution_min: 45000,
-                    resolution_max: 45000,
-                    swath_min: "N/A",
-                    swath_max: "N/A"
-                },
-                {
-                    sensor_id: 33,
-                    name: "ASTER",
-                    type: "Multispectral",
-                    description: "Advanced Spaceborne Thermal Emission and Reflection Radiometer",
-                    bands: 14,
-                    resolution_min: 15,
-                    resolution_max: 90,
-                    swath_min: 60,
-                    swath_max: 60
-                },
-                {
-                    sensor_id: 62,
-                    name: "DORIS",
-                    type: "Altimeter",
-                    description: "Doppler Orbitography and Radiopositioning Integrated on Satellite",
-                    bands: 2,
-                    resolution_min: "N/A",
-                    resolution_max: "N/A",
-                    swath_min: "N/A",
-                    swath_max: "N/A"
-                }
-            ],
-            // Normalized link table: maps satellites to sensors (from Excel satellite_sensor tab)
-            satellite_sensor_links: [
-                { norad_id: 27424, sensor_id: 11 },
-                { norad_id: 27424, sensor_id: 26 },
-                { norad_id: 27424, sensor_id: 27 },
-                { norad_id: 25994, sensor_id: 33 },
-                { norad_id: 52171, sensor_id: 1 },
-                { norad_id: 43812, sensor_id: 4 }
-            ]
+            satellites: [],
+            sensors: [],
+            satellite_sensor_links: []
         };
 
         let currentTab = 'satellites';
         let selectedItem = null;
         let currentFilter = null;
+        let searchTerm = '';
 
         // ============================================================
-        // TAB AND FILTER MANAGEMENT
+        // POLYFILL: AbortSignal.timeout
         // ============================================================
 
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentTab = tab.dataset.tab;
-                currentFilter = null;
-                renderFilterControls();
-                renderList();
+        if (!AbortSignal.timeout) {
+            AbortSignal.timeout = function(ms) {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), ms);
+                return controller.signal;
+            };
+        }
+
+        // ============================================================
+        // SHAREPOINT API FUNCTIONS
+        // ============================================================
+
+        async function loadSatellites() {
+            if (!config.inSharePoint || !config.siteUrl) {
+                showAlert('Not in SharePoint mode', 'info');
+                return;
+            }
+
+            try {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items?$select=ID,Title,NORAD_ID,COSPAR_ID,Mission_Type,Status,Orbit_Type,Launch_Date,Constellation_ID,Sensor_Names&$top=5000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+                data.satellites = (result?.d?.results ?? []).map(item => ({
+                    ID: item.ID,
+                    norad_id: item.NORAD_ID || item.ID, // Use NORAD_ID as key, fallback to ID
+                    name: item.Title || 'Unknown',
+                    cospar_id: item.COSPAR_ID || '',
+                    status: item.Status || 'Unknown',
+                    mission: item.Mission_Type || '',
+                    orbit_type: item.Orbit_Type || '',
+                    launch_date: item.Launch_Date ? new Date(item.Launch_Date).toISOString().split('T')[0] : '',
+                    constellation_id: item.Constellation_ID || '',
+                    sensor_names: item.Sensor_Names || '' // Will be used to build links
+                }));
+
+                console.log(`✅ Loaded ${data.satellites.length} satellites from SharePoint`);
+                showAlert(`✅ Loaded ${data.satellites.length} satellites`, 'success');
+            } catch (error) {
+                console.error('Error loading satellites:', error);
+                showAlert('❌ Error loading satellites: ' + error.message, 'error');
+            }
+        }
+
+        async function loadSensors() {
+            if (!config.inSharePoint || !config.siteUrl) {
+                data.sensors = [];
+                return;
+            }
+
+            try {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.sensorList}')/items?$select=ID,Title,Sensor_Type,Description,N_of_Bands,Resolution_Min_m,Resolution_Max_m,Swath_Min_km,Swath_Max_km,Satellite_Names&$top=5000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+                data.sensors = (result?.d?.results ?? []).map(item => ({
+                    sensor_id: item.ID,
+                    name: item.Title || 'Unknown',
+                    type: item.Sensor_Type || '',
+                    description: item.Description || '',
+                    bands: item.N_of_Bands || '',
+                    resolution_min: item.Resolution_Min_m || 'N/A',
+                    resolution_max: item.Resolution_Max_m || 'N/A',
+                    swath_min: item.Swath_Min_km || 'N/A',
+                    swath_max: item.Swath_Max_km || 'N/A',
+                    satellite_names: item.Satellite_Names || '' // For reverse lookup
+                }));
+
+                console.log(`✅ Loaded ${data.sensors.length} sensors from SharePoint`);
+            } catch (error) {
+                console.error('Error loading sensors:', error);
+                data.sensors = [];
+            }
+        }
+
+        function buildSatelliteSensorLinks() {
+            // Build normalized link table from Sensor_Names field
+            data.satellite_sensor_links = [];
+
+            data.satellites.forEach(sat => {
+                if (!sat.sensor_names) return;
+
+                // Parse comma-separated sensor names
+                const sensorNames = sat.sensor_names
+                    .split(',')
+                    .map(s => s.trim().toLowerCase())
+                    .filter(s => s);
+
+                // Match to actual sensor IDs
+                sensorNames.forEach(sensorName => {
+                    const matchedSensor = data.sensors.find(sensor =>
+                        sensor.name.toLowerCase().trim() === sensorName ||
+                        sensor.name.toLowerCase().includes(sensorName) ||
+                        sensorName.includes(sensor.name.toLowerCase())
+                    );
+
+                    if (matchedSensor) {
+                        // Add link if not already present
+                        const exists = data.satellite_sensor_links.some(
+                            link => link.norad_id === sat.norad_id && link.sensor_id === matchedSensor.sensor_id
+                        );
+
+                        if (!exists) {
+                            data.satellite_sensor_links.push({
+                                norad_id: sat.norad_id,
+                                sensor_id: matchedSensor.sensor_id
+                            });
+                        }
+                    }
+                });
             });
+
+            console.log(`✅ Built ${data.satellite_sensor_links.length} satellite-sensor links`);
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Initializing Satellite Sensor Explorer v5.7.0');
+            console.log('SharePoint Mode:', config.inSharePoint ? 'YES' : 'NO');
+
+            const statusEl = document.getElementById('connectionStatus');
+            if (config.inSharePoint) {
+                statusEl.textContent = 'SharePoint Connected';
+                statusEl.style.color = 'var(--color-success)';
+            } else {
+                statusEl.textContent = 'Local Mode';
+                statusEl.style.color = 'var(--color-text-secondary)';
+            }
+
+            if (config.inSharePoint && config.siteUrl) {
+                await loadSatellites();
+                await loadSensors();
+                buildSatelliteSensorLinks();
+            } else {
+                // Fallback sample data for testing outside SharePoint
+                data.satellites = [
+                    { norad_id: 27424, name: "AQUA", cospar_id: "2002-022A", status: "Operational", mission: "METOC", orbit_type: "SSO", launch_date: "2002-05-04", constellation_id: "", sensor_names: "AIRS, AMSR-E" },
+                    { norad_id: 25994, name: "TERRA", cospar_id: "1999-071A", status: "Operational", mission: "METOC", orbit_type: "SSO", launch_date: "1999-12-18", constellation_id: "", sensor_names: "ASTER" }
+                ];
+                data.sensors = [
+                    { sensor_id: 11, name: "AIRS", type: "Infrared", description: "Atmospheric Infrared Sounder", bands: 7, resolution_min: 13500, resolution_max: 13500, swath_min: "N/A", swath_max: "N/A" },
+                    { sensor_id: 26, name: "AMSR-E", type: "Microwave", description: "Advanced Microwave Scanning Radiometer", bands: 6, resolution_min: 5000, resolution_max: 56000, swath_min: 1450, swath_max: 1450 },
+                    { sensor_id: 33, name: "ASTER", type: "Multispectral", description: "Advanced Spaceborne Thermal Emission", bands: 14, resolution_min: 15, resolution_max: 90, swath_min: 60, swath_max: 60 }
+                ];
+                buildSatelliteSensorLinks();
+            }
+
+            attachEventListeners();
+            renderFilterControls();
+            renderList();
+
+            console.log('✅ Initialization complete');
         });
 
-        document.getElementById('searchInput').addEventListener('keyup', renderList);
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+
+        function attachEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentTab = tab.dataset.tab;
+                    currentFilter = null;
+                    renderFilterControls();
+                    renderList();
+                });
+            });
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderList();
+            });
+        }
+
+        // ============================================================
+        // FILTER CONTROLS
+        // ============================================================
 
         function renderFilterControls() {
             const filterControls = document.getElementById('filterControls');
             const filters = [];
 
             if (currentTab === 'satellites') {
-                // Satellite filters: Status, Orbit Type, Constellation
                 const statuses = [...new Set(data.satellites.map(s => s.status).filter(Boolean))];
                 const orbits = [...new Set(data.satellites.map(s => s.orbit_type).filter(Boolean))];
 
-                filters.push({ label: 'All', type: 'status', value: null });
-                statuses.forEach(status => {
-                    filters.push({ label: status, type: 'status', value: status });
-                });
-                orbits.forEach(orbit => {
-                    filters.push({ label: orbit, type: 'orbit', value: orbit });
-                });
+                filters.push({ label: 'All', value: null });
+                statuses.forEach(status => filters.push({ label: status, value: status, type: 'status' }));
+                orbits.forEach(orbit => filters.push({ label: orbit, value: orbit, type: 'orbit' }));
             } else {
-                // Sensor filters: Type
                 const types = [...new Set(data.sensors.map(s => s.type).filter(Boolean))];
-                filters.push({ label: 'All', type: 'all', value: null });
-                types.forEach(type => {
-                    filters.push({ label: type, type: 'type', value: type });
-                });
+                filters.push({ label: 'All', value: null });
+                types.forEach(type => filters.push({ label: type, value: type }));
             }
 
-            filterControls.innerHTML = filters
-                .map(f => `<button class="filter-btn" onclick="setFilter('${f.type}', ${f.value ? `'${f.value}'` : 'null'})">
-                    ${f.label}
-                </button>`)
-                .join('');
-            filterControls.style.display = filters.length > 0 ? 'flex' : 'none';
+            if (filters.length > 1) {
+                filterControls.innerHTML = filters
+                    .map(f => `<button class="filter-btn ${!currentFilter && !f.value ? 'active' : currentFilter === f.value ? 'active' : ''}" onclick="setFilter('${f.value}')">${f.label}</button>`)
+                    .join('');
+                filterControls.style.display = 'flex';
+            } else {
+                filterControls.style.display = 'none';
+            }
         }
 
-        function setFilter(type, value) {
-            currentFilter = value;
+        function setFilter(value) {
+            currentFilter = value === 'null' ? null : value;
+            renderFilterControls();
             renderList();
         }
 
@@ -672,35 +769,41 @@
 
         function renderList() {
             const listContainer = document.getElementById('listContainer');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             let items = [];
 
             if (currentTab === 'satellites') {
                 items = data.satellites
                     .filter(s => {
-                        const matchesSearch = s.name.toLowerCase().includes(searchTerm) ||
-                            s.constellation.toLowerCase().includes(searchTerm) ||
+                        const matchesSearch = !searchTerm ||
+                            s.name.toLowerCase().includes(searchTerm) ||
                             s.norad_id.toString().includes(searchTerm);
-                        const matchesFilter = !currentFilter || s.status === currentFilter || s.orbit_type === currentFilter;
+                        const matchesFilter = !currentFilter ||
+                            s.status === currentFilter ||
+                            s.orbit_type === currentFilter;
                         return matchesSearch && matchesFilter;
                     })
-                    .map(item => ({
-                        ...item,
-                        sensorCount: data.satellite_sensor_links.filter(l => l.norad_id === item.norad_id).length
-                    }));
+                    .map(item => {
+                        const sensorCount = data.satellite_sensor_links.filter(l => l.norad_id === item.norad_id).length;
+                        return { ...item, sensorCount };
+                    });
             } else {
                 items = data.sensors
                     .filter(s => {
-                        const matchesSearch = s.name.toLowerCase().includes(searchTerm) ||
-                            s.type.toLowerCase().includes(searchTerm) ||
-                            s.sensor_id.toString().includes(searchTerm);
+                        const matchesSearch = !searchTerm ||
+                            s.name.toLowerCase().includes(searchTerm) ||
+                            s.type.toLowerCase().includes(searchTerm);
                         const matchesFilter = !currentFilter || s.type === currentFilter;
                         return matchesSearch && matchesFilter;
                     })
-                    .map(item => ({
-                        ...item,
-                        satelliteCount: data.satellite_sensor_links.filter(l => l.sensor_id === item.sensor_id).length
-                    }));
+                    .map(item => {
+                        const satelliteCount = data.satellite_sensor_links.filter(l => l.sensor_id === item.sensor_id).length;
+                        return { ...item, satelliteCount };
+                    });
+            }
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<div class="no-data">No results found</div>';
+                return;
             }
 
             listContainer.innerHTML = items.map(item => {
@@ -711,10 +814,10 @@
 
                 return `
                     <div class="list-item" onclick="selectItem('${key}', ${itemId}, '${currentTab}')">
-                        <div class="list-item-title">${item.name}</div>
+                        <div class="list-item-title">${escapeHtml(item.name)}</div>
                         <div class="list-item-meta">
                             ${currentTab === 'satellites' ?
-                                `${item.constellation} • ${item.orbit_type}` :
+                                `${item.orbit_type} • ${item.status}` :
                                 `${item.type}`
                             }
                             <span class="sensor-count-badge">${count} ${countLabel}</span>
@@ -722,10 +825,6 @@
                     </div>
                 `;
             }).join('');
-
-            if (items.length === 0) {
-                listContainer.innerHTML = '<div class="no-data">No results found</div>';
-            }
         }
 
         // ============================================================
@@ -753,7 +852,7 @@
             if (type === 'satellites') {
                 item = data.satellites.find(s => s.norad_id === value);
                 html = `
-                    <h2><span class="icon">🛰️</span>${item.name}</h2>
+                    <h2><span class="icon">🛰️</span>${escapeHtml(item.name)}</h2>
                     <div class="detail-grid">
                         <div class="detail-item">
                             <div class="detail-label">NORAD ID</div>
@@ -761,39 +860,41 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">COSPAR ID</div>
-                            <div class="detail-value">${item.cospar_id || '-'}</div>
+                            <div class="detail-value">${escapeHtml(item.cospar_id || '-')}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Status</div>
-                            <div class="detail-value">${item.status}</div>
+                            <div class="detail-value">${escapeHtml(item.status)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Orbit Type</div>
-                            <div class="detail-value">${item.orbit_type}</div>
+                            <div class="detail-value">${escapeHtml(item.orbit_type)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Mission</div>
-                            <div class="detail-value">${item.mission}</div>
+                            <div class="detail-value">${escapeHtml(item.mission || '-')}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Constellation</div>
-                            <div class="detail-value">${item.constellation}</div>
+                            <div class="detail-label">Launch Date</div>
+                            <div class="detail-value">${escapeHtml(item.launch_date || '-')}</div>
                         </div>
                     </div>
+                    ${item.constellation_id ? `
                     <div class="section-title">Mission Information</div>
                     <div class="detail-item">
-                        <div class="detail-label">Launch Date</div>
-                        <div class="detail-value">${item.launch_date}</div>
+                        <div class="detail-label">Constellation ID</div>
+                        <div class="detail-value">${escapeHtml(item.constellation_id)}</div>
                     </div>
+                    ` : ''}
                 `;
             } else {
                 item = data.sensors.find(s => s.sensor_id === value);
                 html = `
-                    <h2><span class="icon">📡</span>${item.name}</h2>
+                    <h2><span class="icon">📡</span>${escapeHtml(item.name)}</h2>
                     <div class="detail-grid">
                         <div class="detail-item">
                             <div class="detail-label">Sensor Type</div>
-                            <div class="detail-value">${item.type}</div>
+                            <div class="detail-value">${escapeHtml(item.type)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Number of Bands</div>
@@ -813,7 +914,7 @@
                     </div>
                     <div class="section-title">Description</div>
                     <div class="detail-item">
-                        <div class="detail-value">${item.description}</div>
+                        <div class="detail-value">${escapeHtml(item.description)}</div>
                     </div>
                 `;
             }
@@ -833,12 +934,8 @@
             let relationships = [];
 
             if (type === 'satellites') {
-                // Satellite -> Sensors: Find all links for this NORAD ID
-                const satLinks = data.satellite_sensor_links.filter(
-                    link => link.norad_id === value
-                );
-
-                // Deduplicate and map to sensor objects
+                // Satellite -> Sensors
+                const satLinks = data.satellite_sensor_links.filter(link => link.norad_id === value);
                 const seen = new Set();
                 relationships = satLinks
                     .map(link => data.sensors.find(s => s.sensor_id === link.sensor_id))
@@ -851,19 +948,15 @@
                         clickType: 'sensors'
                     }));
             } else {
-                // Sensor -> Satellites: Find all links for this sensor ID
-                const sensorLinks = data.satellite_sensor_links.filter(
-                    link => link.sensor_id === value
-                );
-
-                // Deduplicate and map to satellite objects
+                // Sensor -> Satellites
+                const sensorLinks = data.satellite_sensor_links.filter(link => link.sensor_id === value);
                 const seen = new Set();
                 relationships = sensorLinks
                     .map(link => data.satellites.find(s => s.norad_id === link.norad_id))
                     .filter(sat => sat && !seen.has(sat.norad_id) && seen.add(sat.norad_id))
                     .map(sat => ({
                         name: sat.name,
-                        type: sat.constellation,
+                        type: `${sat.orbit_type} (${sat.norad_id})`,
                         id: sat.norad_id,
                         relType: 'satellite',
                         clickType: 'satellites'
@@ -882,8 +975,8 @@
                 relationships.map(rel =>
                     `<div class="relationship-item ${rel.relType === 'sensor' ? 'sensor-type' : ''}"
                         onclick="switchAndSelect('${rel.clickType}', ${rel.id})">
-                        <div class="rel-title">${rel.name}</div>
-                        <div class="rel-type">${rel.type}</div>
+                        <div class="rel-title">${escapeHtml(rel.name)}</div>
+                        <div class="rel-type">${escapeHtml(rel.type)}</div>
                     </div>`
                 ).join('');
         }
@@ -907,6 +1000,8 @@
                     data.satellites.find(s => s.norad_id === itemId) :
                     data.sensors.find(s => s.sensor_id === itemId);
 
+                if (!itemToSelect) return;
+
                 const items = document.querySelectorAll('.list-item');
                 const targetItem = Array.from(items).find(item =>
                     item.querySelector('.list-item-title').textContent === itemToSelect.name
@@ -919,12 +1014,31 @@
         }
 
         // ============================================================
-        // INITIALIZATION
+        // UTILITIES
         // ============================================================
 
-        // Initial render
-        renderFilterControls();
-        renderList();
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // Make functions globally accessible for onclick handlers
+        window.selectItem = selectItem;
+        window.switchAndSelect = switchAndSelect;
+        window.setFilter = setFilter;
+
+        console.log('✅ Satellite Sensor Explorer v5.7.0 loaded and ready');
     </script>
 </body>
 </html>
