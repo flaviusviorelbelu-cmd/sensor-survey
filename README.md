@@ -623,7 +623,7 @@ $sensors | Export-Csv "backup_sensors_$date.csv" -NoTypeInformation
 ## Support & Maintenance
 
 **Developer:** Flavius Viorel Belu  
-**Organization:** NCIA (NATO Scientific Network) / ROMPRO Foundation  
+**Organization:** BKF IT 
 **Location:** Den Haag, Netherlands  
 **Last Updated:** January 23, 2026
 
