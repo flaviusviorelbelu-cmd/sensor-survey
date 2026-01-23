@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Sensor Explorer v5.7.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0f172a;
+            --color-surface: #1e293b;
+            --color-border: #334155;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-primary: #38bdf8;
+            --color-primary-hover: #0284c7;
+            --color-success: #10b981;
+            --color-accent: #a78bfa;
+            --color-error: #ef4444;
+            --color-warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+        }
+
+        .header p {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--color-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .action-toolbar {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .btn-danger {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-box {
+            padding: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 13px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background-color: rgba(56, 189, 248, 0.1);
+        }
+
+        .sort-controls {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .sort-controls label {
+            color: var(--color-text-secondary);
+        }
+
+        .sort-controls select {
+            flex: 1;
+            padding: 6px 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            color: var(--color-text);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .sort-controls select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .filter-controls {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .filter-btn.active {
+            background-color: rgba(56, 189, 248, 0.2);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .list-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--color-primary);
+        }
+
+        .list-item.active {
+            background-color: rgba(56, 189, 248, 0.15);
+            border-left-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .list-item:hover .list-item-actions {
+            opacity: 1;
+        }
+
+        .list-item-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .list-item-meta {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-section {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .details-panel {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--color-bg);
+            overflow-y: auto;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .details-panel h2 {
+            color: var(--color-primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-panel h2 .icon {
+            font-size: 28px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            background-color: var(--color-surface);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .section-title {
+            color: var(--color-accent);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 10px;
+        }
+
+        .relationships-panel {
+            width: 280px;
+            background-color: var(--color-surface);
+            border-left: 1px solid var(--color-border);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .relationships-panel h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .relationships-count {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .relationship-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-success);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .relationship-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .relationship-item.sensor-type {
+            border-left-color: var(--color-accent);
+        }
+
+        .rel-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .rel-type {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--color-primary);
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 13px;
+        }
+
+        .form-group.required label::after {
+            content: ' *';
+            color: var(--color-error);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--color-text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .form-group input.error,
+        .form-group textarea.error,
+        .form-group select.error {
+            border-color: var(--color-error);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .validation-error {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+            min-height: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .form-actions button {
+            flex: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--color-primary);
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .no-data {
+            padding: 20px;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .sensor-count-badge {
+            display: inline-block;
+            background-color: rgba(167, 139, 250, 0.2);
+            color: var(--color-accent);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            border-color: var(--color-success);
+            color: var(--color-success);
+        }
+
+        .alert-error {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+
+        .alert-info {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>🛰️ Explorer</h1>
+                <p id="connectionStatus">Loading...</p>
+                <div class="version-badge">v5.7.2 Fixed</div>
+            </div>
+
+            <div class="action-toolbar" id="actionToolbar">
+                <button type="button" class="btn btn-primary" id="addBtn" style="flex: 1;">+ Add</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search...">
+            </div>
+
+            <div class="tabs">
+                <button type="button" class="tab active" data-tab="satellites">Satellites</button>
+                <button type="button" class="tab" data-tab="sensors">Sensors</button>
+            </div>
+
+            <div class="sort-controls">
+                <label>Sort:</label>
+                <select id="sortSelect">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div class="filter-controls" id="filterControls" style="display: none;">
+                <!-- Filters populated by JS -->
+            </div>
+
+            <div class="list-container" id="listContainer">
+                <div class="empty-state">
+                    <div class="loading"></div>
+                    <p style="margin-top: 10px;">Loading data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="top-section">
+                <!-- DETAILS PANEL -->
+                <div class="details-panel" id="detailsPanel">
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>Select a satellite or sensor to view details</p>
+                    </div>
+                </div>
+
+                <!-- RELATIONSHIPS PANEL -->
+                <div class="relationships-panel" id="relationshipsPanel">
+                    <h3>Relationships</h3>
+                    <div id="relationshipsList" class="no-data">No selection</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT SATELLITE MODAL -->
+    <div id="satelliteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="satelliteModalTitle">Add Satellite</h3>
+                <button type="button" class="modal-close">&times;</button>
+            </div>
+            <form id="satelliteForm">
+                <div class="form-group required">
+                    <label for="sat-name">Satellite Name</label>
+                    <input type="text" id="sat-name" placeholder="Enter satellite name">
+                    <span class="validation-error" id="error-sat-name"></span>
+                </div>
+                <div class="form-group required">
+                    <label for="sat-norad">NORAD ID</label>
+                    <input type="text" id="sat-norad" placeholder="Enter NORAD ID">
+                    <span class="validation-error" id="error-sat-norad"></span>
+                </div>
+                <div class="form-group">
+                    <label for="sat-cospar">COSPAR ID</label>
+                    <input type="text" id="sat-cospar" placeholder="e.g., 2013-008A">
+                </div>
+                <div class="form-group">
+                    <label for="sat-mission">Mission Type</label>
+                    <input type="text" id="sat-mission" placeholder="e.g., Earth Observation">
+                </div>
+                <div class="form-group">
+                    <label for="sat-status">Status</label>
+                    <select id="sat-status">
+                        <option value="Operational">Operational</option>
+                        <option value="Non-operational">Non-operational</option>
+                        <option value="Partially operational">Partially operational</option>
+                        <option value="Unknown">Unknown</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sat-orbit">Orbit Type</label>
+                    <select id="sat-orbit">
+                        <option value="">-- Select --</option>
+                        <option value="LEO">LEO</option>
+                        <option value="MEO">MEO</option>
+                        <option value="GEO">GEO</option>
+                        <option value="SSO">SSO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sat-launch">Launch Date</label>
+                    <input type="date" id="sat-launch">
+                </div>
+                <div class="form-group">
+                    <label for="sat-sensors">Sensor Names (comma-separated)</label>
+                    <textarea id="sat-sensors" placeholder="e.g., AIRS, AMSR-E"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="saveSatelliteBtn">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelSatelliteBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <script>
+        /**
+         * SATELLITE SENSOR EXPLORER v5.7.2
+         * FIX: Prevent page refresh on button clicks
+         */
+
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+
+        const config = {
+            satelliteList: 'Satellite_Fixed',
+            sensorList: 'Sensor',
+            linkList: 'satellite_sensor',
+            inSharePoint: typeof _spPageContextInfo !== 'undefined' && _spPageContextInfo?.webAbsoluteUrl,
+            siteUrl: typeof _spPageContextInfo !== 'undefined' ? _spPageContextInfo.webAbsoluteUrl : '',
+            apiTimeout: 30000
+        };
+
+        // ============================================================
+        // STATE
+        // ============================================================
+
+        const data = {
+            satellites: [],
+            sensors: [],
+            satellite_sensor_links: []
+        };
+
+        let currentTab = 'satellites';
+        let selectedItem = null;
+        let currentFilter = null;
+        let searchTerm = '';
+        let currentSort = { column: 'name', direction: 'asc' };
+        let editingId = null;
+
+        // ============================================================
+        // POLYFILL: AbortSignal.timeout
+        // ============================================================
+
+        if (!AbortSignal.timeout) {
+            AbortSignal.timeout = function(ms) {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), ms);
+                return controller.signal;
+            };
+        }
+
+        // ============================================================
+        // SHAREPOINT API FUNCTIONS
+        // ============================================================
+
+        async function loadSatellites() {
+            if (!config.inSharePoint || !config.siteUrl) {
+                showAlert('Not in SharePoint mode', 'info');
+                return;
+            }
+
+            try {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items?$select=ID,Title,NORAD_ID,COSPAR_ID,Mission_Type,Status,Orbit_Type,Launch_Date,Constellation_ID,Sensor_Names&$top=5000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+                data.satellites = (result?.d?.results ?? []).map(item => ({
+                    ID: item.ID,
+                    norad_id: item.NORAD_ID || item.ID,
+                    name: item.Title || 'Unknown',
+                    cospar_id: item.COSPAR_ID || '',
+                    status: item.Status || 'Unknown',
+                    mission: item.Mission_Type || '',
+                    orbit_type: item.Orbit_Type || '',
+                    launch_date: item.Launch_Date ? new Date(item.Launch_Date).toISOString().split('T')[0] : '',
+                    constellation_id: item.Constellation_ID || '',
+                    sensor_names: item.Sensor_Names || ''
+                }));
+
+                console.log(`✅ Loaded ${data.satellites.length} satellites from SharePoint`);
+                showAlert(`✅ Loaded ${data.satellites.length} satellites`, 'success');
+            } catch (error) {
+                console.error('Error loading satellites:', error);
+                showAlert('❌ Error loading satellites: ' + error.message, 'error');
+            }
+        }
+
+        async function loadSensors() {
+            if (!config.inSharePoint || !config.siteUrl) {
+                data.sensors = [];
+                return;
+            }
+
+            try {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.sensorList}')/items?$select=ID,Title,Sensor_Type,Description,N_of_Bands,Resolution_Min_m,Resolution_Max_m,Swath_Min_km,Swath_Max_km,Satellite_Names&$top=5000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+                data.sensors = (result?.d?.results ?? []).map(item => ({
+                    sensor_id: item.ID,
+                    name: item.Title || 'Unknown',
+                    type: item.Sensor_Type || '',
+                    description: item.Description || '',
+                    bands: item.N_of_Bands || '',
+                    resolution_min: item.Resolution_Min_m || 'N/A',
+                    resolution_max: item.Resolution_Max_m || 'N/A',
+                    swath_min: item.Swath_Min_km || 'N/A',
+                    swath_max: item.Swath_Max_km || 'N/A',
+                    satellite_names: item.Satellite_Names || ''
+                }));
+
+                console.log(`✅ Loaded ${data.sensors.length} sensors from SharePoint`);
+            } catch (error) {
+                console.error('Error loading sensors:', error);
+                data.sensors = [];
+            }
+        }
+
+        async function loadSatelliteSensorLinks() {
+            if (!config.inSharePoint || !config.siteUrl) {
+                buildSatelliteSensorLinksFromNames();
+                return;
+            }
+
+            try {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.linkList}')/items?$select=ID,norad_id,sensor_id&$top=5000`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    data.satellite_sensor_links = (result?.d?.results ?? []).map(item => ({
+                        norad_id: item.norad_id,
+                        sensor_id: item.sensor_id
+                    }));
+                    console.log(`✅ Loaded ${data.satellite_sensor_links.length} links from satellite_sensor list`);
+                } else {
+                    throw new Error('List not found, using fallback');
+                }
+            } catch (error) {
+                console.warn('satellite_sensor list not found, falling back to Sensor_Names parsing');
+                buildSatelliteSensorLinksFromNames();
+            }
+        }
+
+        function buildSatelliteSensorLinksFromNames() {
+            data.satellite_sensor_links = [];
+
+            data.satellites.forEach(sat => {
+                if (!sat.sensor_names) return;
+
+                const sensorNames = sat.sensor_names
+                    .split(',')
+                    .map(s => s.trim().toLowerCase())
+                    .filter(s => s);
+
+                sensorNames.forEach(sensorName => {
+                    const matchedSensor = data.sensors.find(sensor =>
+                        sensor.name.toLowerCase().trim() === sensorName ||
+                        sensor.name.toLowerCase().includes(sensorName) ||
+                        sensorName.includes(sensor.name.toLowerCase())
+                    );
+
+                    if (matchedSensor) {
+                        const exists = data.satellite_sensor_links.some(
+                            link => link.norad_id === sat.norad_id && link.sensor_id === matchedSensor.sensor_id
+                        );
+
+                        if (!exists) {
+                            data.satellite_sensor_links.push({
+                                norad_id: sat.norad_id,
+                                sensor_id: matchedSensor.sensor_id
+                            });
+                        }
+                    }
+                });
+            });
+
+            console.log(`✅ Built ${data.satellite_sensor_links.length} links from Sensor_Names field`);
+        }
+
+        async function saveSatelliteToSharePoint(satelliteData) {
+            try {
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!digestResponse.ok) throw new Error('Failed to get digest');
+                const digestData = await digestResponse.json();
+                const digest = digestData?.d?.GetContextWebInformation?.FormDigestValue;
+
+                const payload = {
+                    '__metadata': { 'type': 'SP.Data.Satellite_x005f_FixedListItem' },
+                    'Title': satelliteData.name,
+                    'NORAD_ID': parseInt(satelliteData.norad_id),
+                    'COSPAR_ID': satelliteData.cospar_id || '',
+                    'Mission_Type': satelliteData.mission || '',
+                    'Status': satelliteData.status || 'Operational',
+                    'Orbit_Type': satelliteData.orbit_type || '',
+                    'Launch_Date': satelliteData.launch_date ? new Date(satelliteData.launch_date).toISOString() : null,
+                    'Sensor_Names': satelliteData.sensor_names || ''
+                };
+
+                let url, method, headers;
+                if (editingId) {
+                    url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${editingId})`;
+                    method = 'POST';
+                    headers = {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': digest,
+                        'X-HTTP-Method': 'MERGE',
+                        'IF-MATCH': '*'
+                    };
+                } else {
+                    url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items`;
+                    method = 'POST';
+                    headers = {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': digest
+                    };
+                }
+
+                const response = await fetch(url, {
+                    method,
+                    headers,
+                    body: JSON.stringify(payload),
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (response.ok || response.status === 201 || response.status === 204) {
+                    const action = editingId ? 'updated' : 'added';
+                    showAlert(`✅ Satellite ${action}!`, 'success');
+                    closeSatelliteModal();
+                    editingId = null;
+                    await loadSatellites();
+                    await loadSatelliteSensorLinks();
+                    renderList();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error saving satellite:', error);
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteSatelliteFromSharePoint(id) {
+            try {
+                const contextUrl = config.siteUrl + '/_api/contextinfo';
+                const digestResponse = await fetch(contextUrl, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (!digestResponse.ok) throw new Error('Failed to get digest');
+                const digestData = await digestResponse.json();
+                const digest = digestData?.d?.GetContextWebInformation?.FormDigestValue;
+
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items(${id})`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'X-RequestDigest': digest,
+                        'X-HTTP-Method': 'DELETE',
+                        'IF-MATCH': '*'
+                    },
+                    credentials: 'include',
+                    signal: AbortSignal.timeout(config.apiTimeout)
+                });
+
+                if (response.ok || response.status === 204) {
+                    showAlert('✅ Satellite deleted!', 'success');
+                    selectedItem = null;
+                    await loadSatellites();
+                    await loadSatelliteSensorLinks();
+                    renderList();
+                    clearDetails();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error deleting satellite:', error);
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Initializing Satellite Sensor Explorer v5.7.2');
+            console.log('SharePoint Mode:', config.inSharePoint ? 'YES' : 'NO');
+
+            const statusEl = document.getElementById('connectionStatus');
+            if (config.inSharePoint) {
+                statusEl.textContent = 'SharePoint Connected';
+                statusEl.style.color = 'var(--color-success)';
+            } else {
+                statusEl.textContent = 'Local Mode';
+                statusEl.style.color = 'var(--color-text-secondary)';
+            }
+
+            if (config.inSharePoint && config.siteUrl) {
+                await loadSatellites();
+                await loadSensors();
+                await loadSatelliteSensorLinks();
+            } else {
+                data.satellites = [
+                    { ID: 1, norad_id: 27424, name: "AQUA", cospar_id: "2002-022A", status: "Operational", mission: "METOC", orbit_type: "SSO", launch_date: "2002-05-04", constellation_id: "", sensor_names: "AIRS, AMSR-E" },
+                    { ID: 2, norad_id: 25994, name: "TERRA", cospar_id: "1999-071A", status: "Operational", mission: "METOC", orbit_type: "SSO", launch_date: "1999-12-18", constellation_id: "", sensor_names: "ASTER" }
+                ];
+                data.sensors = [
+                    { sensor_id: 11, name: "AIRS", type: "Infrared", description: "Atmospheric Infrared Sounder", bands: 7, resolution_min: 13500, resolution_max: 13500, swath_min: "N/A", swath_max: "N/A" },
+                    { sensor_id: 26, name: "AMSR-E", type: "Microwave", description: "Advanced Microwave Scanning Radiometer", bands: 6, resolution_min: 5000, resolution_max: 56000, swath_min: 1450, swath_max: 1450 },
+                    { sensor_id: 33, name: "ASTER", type: "Multispectral", description: "Advanced Spaceborne Thermal Emission", bands: 14, resolution_min: 15, resolution_max: 90, swath_min: 60, swath_max: 60 }
+                ];
+                buildSatelliteSensorLinksFromNames();
+            }
+
+            attachEventListeners();
+            updateSortOptions();
+            renderFilterControls();
+            renderList();
+
+            console.log('✅ Initialization complete');
+        });
+
+        // ============================================================
+        // EVENT LISTENERS - FIXED to prevent page refresh
+        // ============================================================
+
+        function attachEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentTab = tab.dataset.tab;
+                    currentFilter = null;
+                    selectedItem = null;
+                    updateSortOptions();
+                    renderFilterControls();
+                    renderList();
+                    clearDetails();
+                    return false;
+                });
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderList();
+            });
+
+            // Sort
+            document.getElementById('sortSelect').addEventListener('change', (e) => {
+                const [column, direction] = e.target.value.split('-');
+                currentSort = { column, direction };
+                renderList();
+            });
+
+            // Add button
+            document.getElementById('addBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openAddModal();
+                return false;
+            });
+
+            // Modal close button
+            document.querySelector('.modal-close').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeSatelliteModal();
+                return false;
+            });
+
+            // Save button
+            document.getElementById('saveSatelliteBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                saveSatellite();
+                return false;
+            });
+
+            // Cancel button
+            document.getElementById('cancelSatelliteBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeSatelliteModal();
+                return false;
+            });
+
+            // Form submission prevention
+            document.getElementById('satelliteForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+
+            // Modal backdrop click
+            document.getElementById('satelliteModal').addEventListener('click', (e) => {
+                if (e.target.id === 'satelliteModal') {
+                    closeSatelliteModal();
+                }
+            });
+
+            // Prevent modal content clicks from closing
+            document.querySelector('.modal-content').addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // ============================================================
+        // SORT CONTROLS
+        // ============================================================
+
+        function updateSortOptions() {
+            const sortSelect = document.getElementById('sortSelect');
+            let options = [];
+
+            if (currentTab === 'satellites') {
+                options = [
+                    { label: 'Name (A-Z)', value: 'name-asc' },
+                    { label: 'Name (Z-A)', value: 'name-desc' },
+                    { label: 'NORAD ID ↑', value: 'norad_id-asc' },
+                    { label: 'NORAD ID ↓', value: 'norad_id-desc' },
+                    { label: 'Status (A-Z)', value: 'status-asc' },
+                    { label: 'Launch Date (Newest)', value: 'launch_date-desc' },
+                    { label: 'Launch Date (Oldest)', value: 'launch_date-asc' }
+                ];
+            } else {
+                options = [
+                    { label: 'Name (A-Z)', value: 'name-asc' },
+                    { label: 'Name (Z-A)', value: 'name-desc' },
+                    { label: 'Type (A-Z)', value: 'type-asc' },
+                    { label: 'Type (Z-A)', value: 'type-desc' }
+                ];
+            }
+
+            sortSelect.innerHTML = options.map(opt =>
+                `<option value="${opt.value}">${opt.label}</option>`
+            ).join('');
+
+            currentSort = { column: 'name', direction: 'asc' };
+        }
+
+        // ============================================================
+        // FILTER CONTROLS
+        // ============================================================
+
+        function renderFilterControls() {
+            const filterControls = document.getElementById('filterControls');
+            const filters = [];
+
+            if (currentTab === 'satellites') {
+                const statuses = [...new Set(data.satellites.map(s => s.status).filter(Boolean))];
+                const orbits = [...new Set(data.satellites.map(s => s.orbit_type).filter(Boolean))];
+
+                filters.push({ label: 'All', value: null });
+                statuses.forEach(status => filters.push({ label: status, value: status }));
+                orbits.forEach(orbit => filters.push({ label: orbit, value: orbit }));
+            } else {
+                const types = [...new Set(data.sensors.map(s => s.type).filter(Boolean))];
+                filters.push({ label: 'All', value: null });
+                types.forEach(type => filters.push({ label: type, value: type }));
+            }
+
+            if (filters.length > 1) {
+                filterControls.innerHTML = filters
+                    .map(f => `<button type="button" class="filter-btn ${!currentFilter && !f.value ? 'active' : currentFilter === f.value ? 'active' : ''}" data-filter="${f.value}">${f.label}</button>`)
+                    .join('');
+                
+                // Attach click handlers to filter buttons
+                filterControls.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const filterValue = btn.dataset.filter;
+                        setFilter(filterValue === 'null' ? null : filterValue);
+                        return false;
+                    });
+                });
+                
+                filterControls.style.display = 'flex';
+            } else {
+                filterControls.style.display = 'none';
+            }
+        }
+
+        function setFilter(value) {
+            currentFilter = value;
+            renderFilterControls();
+            renderList();
+        }
+
+        // ============================================================
+        // LIST RENDERING
+        // ============================================================
+
+        function renderList() {
+            const listContainer = document.getElementById('listContainer');
+            let items = [];
+
+            if (currentTab === 'satellites') {
+                items = data.satellites
+                    .filter(s => {
+                        const matchesSearch = !searchTerm ||
+                            s.name.toLowerCase().includes(searchTerm) ||
+                            s.norad_id.toString().includes(searchTerm);
+                        const matchesFilter = !currentFilter ||
+                            s.status === currentFilter ||
+                            s.orbit_type === currentFilter;
+                        return matchesSearch && matchesFilter;
+                    })
+                    .map(item => {
+                        const sensorCount = data.satellite_sensor_links.filter(l => l.norad_id === item.norad_id).length;
+                        return { ...item, sensorCount };
+                    });
+            } else {
+                items = data.sensors
+                    .filter(s => {
+                        const matchesSearch = !searchTerm ||
+                            s.name.toLowerCase().includes(searchTerm) ||
+                            s.type.toLowerCase().includes(searchTerm);
+                        const matchesFilter = !currentFilter || s.type === currentFilter;
+                        return matchesSearch && matchesFilter;
+                    })
+                    .map(item => {
+                        const satelliteCount = data.satellite_sensor_links.filter(l => l.sensor_id === item.sensor_id).length;
+                        return { ...item, satelliteCount };
+                    });
+            }
+
+            // Sort items
+            items.sort((a, b) => {
+                let aVal = a[currentSort.column] ?? '';
+                let bVal = b[currentSort.column] ?? '';
+
+                if (currentSort.column === 'norad_id') {
+                    aVal = parseInt(aVal) || 0;
+                    bVal = parseInt(bVal) || 0;
+                }
+
+                if (currentSort.column === 'launch_date') {
+                    aVal = aVal ? new Date(aVal).getTime() : 0;
+                    bVal = bVal ? new Date(bVal).getTime() : 0;
+                }
+
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<div class="no-data">No results found</div>';
+                return;
+            }
+
+            listContainer.innerHTML = items.map(item => {
+                const key = currentTab === 'satellites' ? 'norad_id' : 'sensor_id';
+                const itemId = item[key];
+                const actualId = item.ID || itemId;
+                const count = currentTab === 'satellites' ? item.sensorCount : item.satelliteCount;
+                const countLabel = currentTab === 'satellites' ? 'sensors' : 'satellites';
+
+                return `
+                    <div class="list-item" data-item-key="${key}" data-item-value="${itemId}" data-item-type="${currentTab}">
+                        <div class="list-item-content">
+                            <div class="list-item-title">${escapeHtml(item.name)}</div>
+                            <div class="list-item-meta">
+                                ${currentTab === 'satellites' ?
+                                    `${item.orbit_type} • ${item.status}` :
+                                    `${item.type}`
+                                }
+                                <span class="sensor-count-badge">${count} ${countLabel}</span>
+                            </div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button type="button" class="btn btn-small btn-secondary" data-edit-id="${actualId}">✏️</button>
+                            <button type="button" class="btn btn-small btn-danger" data-delete-id="${actualId}">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Attach event listeners to list items
+            listContainer.querySelectorAll('.list-item').forEach(item => {
+                // Click on item to select
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.list-item-actions')) return; // Don't select if clicking actions
+                    const key = item.dataset.itemKey;
+                    const value = parseInt(item.dataset.itemValue);
+                    const type = item.dataset.itemType;
+                    selectItem(key, value, type);
+                });
+
+                // Edit button
+                const editBtn = item.querySelector('[data-edit-id]');
+                if (editBtn) {
+                    editBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const id = parseInt(editBtn.dataset.editId);
+                        editItem(id);
+                        return false;
+                    });
+                }
+
+                // Delete button
+                const deleteBtn = item.querySelector('[data-delete-id]');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const id = parseInt(deleteBtn.dataset.deleteId);
+                        deleteItem(id);
+                        return false;
+                    });
+                }
+            });
+        }
+
+        // ============================================================
+        // SELECTION AND DETAILS
+        // ============================================================
+
+        function selectItem(key, value, type) {
+            selectedItem = { type, key, value };
+
+            document.querySelectorAll('.list-item').forEach(item => item.classList.remove('active'));
+            const activeItem = document.querySelector(`.list-item[data-item-key="${key}"][data-item-value="${value}"]`);
+            if (activeItem) activeItem.classList.add('active');
+
+            displayDetails();
+            displayRelationships();
+        }
+
+        function displayDetails() {
+            const detailsPanel = document.getElementById('detailsPanel');
+            const type = selectedItem.type;
+            const value = selectedItem.value;
+
+            let item, html;
+
+            if (type === 'satellites') {
+                item = data.satellites.find(s => s.norad_id === value);
+                if (!item) return;
+                
+                html = `
+                    <h2><span class="icon">🛰️</span>${escapeHtml(item.name)}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">NORAD ID</div>
+                            <div class="detail-value">${item.norad_id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">COSPAR ID</div>
+                            <div class="detail-value">${escapeHtml(item.cospar_id || '-')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">${escapeHtml(item.status)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Orbit Type</div>
+                            <div class="detail-value">${escapeHtml(item.orbit_type)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Mission</div>
+                            <div class="detail-value">${escapeHtml(item.mission || '-')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Launch Date</div>
+                            <div class="detail-value">${escapeHtml(item.launch_date || '-')}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                item = data.sensors.find(s => s.sensor_id === value);
+                if (!item) return;
+                
+                html = `
+                    <h2><span class="icon">📡</span>${escapeHtml(item.name)}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Sensor Type</div>
+                            <div class="detail-value">${escapeHtml(item.type)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Number of Bands</div>
+                            <div class="detail-value">${item.bands || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Specifications</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Resolution (m)</div>
+                            <div class="detail-value">${item.resolution_min} – ${item.resolution_max}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Swath Width (km)</div>
+                            <div class="detail-value">${item.swath_min} – ${item.swath_max}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Description</div>
+                    <div class="detail-item">
+                        <div class="detail-value">${escapeHtml(item.description)}</div>
+                    </div>
+                `;
+            }
+
+            detailsPanel.innerHTML = html;
+        }
+
+        function clearDetails() {
+            document.getElementById('detailsPanel').innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📊</div>
+                    <p>Select a satellite or sensor to view details</p>
+                </div>
+            `;
+            document.getElementById('relationshipsList').innerHTML = '<div class="no-data">No selection</div>';
+        }
+
+        // ============================================================
+        // RELATIONSHIPS
+        // ============================================================
+
+        function displayRelationships() {
+            const relationshipsList = document.getElementById('relationshipsList');
+            const type = selectedItem.type;
+            const value = selectedItem.value;
+
+            let relationships = [];
+
+            if (type === 'satellites') {
+                const satLinks = data.satellite_sensor_links.filter(link => link.norad_id === value);
+                const seen = new Set();
+                relationships = satLinks
+                    .map(link => data.sensors.find(s => s.sensor_id === link.sensor_id))
+                    .filter(sensor => sensor && !seen.has(sensor.sensor_id) && seen.add(sensor.sensor_id))
+                    .map(sensor => ({
+                        name: sensor.name,
+                        type: sensor.type,
+                        id: sensor.sensor_id,
+                        relType: 'sensor',
+                        clickType: 'sensors'
+                    }));
+            } else {
+                const sensorLinks = data.satellite_sensor_links.filter(link => link.sensor_id === value);
+                const seen = new Set();
+                relationships = sensorLinks
+                    .map(link => data.satellites.find(s => s.norad_id === link.norad_id))
+                    .filter(sat => sat && !seen.has(sat.norad_id) && seen.add(sat.norad_id))
+                    .map(sat => ({
+                        name: sat.name,
+                        type: `${sat.orbit_type} (${sat.norad_id})`,
+                        id: sat.norad_id,
+                        relType: 'satellite',
+                        clickType: 'satellites'
+                    }));
+            }
+
+            if (relationships.length === 0) {
+                relationshipsList.innerHTML = '<div class="no-data">No relationships found</div>';
+                return;
+            }
+
+            const label = type === 'satellites' ? 'sensors' : 'satellites';
+
+            relationshipsList.innerHTML =
+                `<div class="relationships-count">${relationships.length} linked ${label}</div>` +
+                relationships.map(rel =>
+                    `<div class="relationship-item ${rel.relType === 'sensor' ? 'sensor-type' : ''}" data-switch-tab="${rel.clickType}" data-switch-id="${rel.id}">
+                        <div class="rel-title">${escapeHtml(rel.name)}</div>
+                        <div class="rel-type">${escapeHtml(rel.type)}</div>
+                    </div>`
+                ).join('');
+            
+            // Attach click handlers to relationship items
+            relationshipsList.querySelectorAll('.relationship-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = item.dataset.switchTab;
+                    const itemId = parseInt(item.dataset.switchId);
+                    switchAndSelect(tabName, itemId);
+                });
+            });
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        function switchAndSelect(tabName, itemId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            currentTab = tabName;
+            currentFilter = null;
+
+            updateSortOptions();
+            renderFilterControls();
+            renderList();
+            setTimeout(() => {
+                const itemToSelect = currentTab === 'satellites' ?
+                    data.satellites.find(s => s.norad_id === itemId) :
+                    data.sensors.find(s => s.sensor_id === itemId);
+
+                if (itemToSelect) {
+                    const key = currentTab === 'satellites' ? 'norad_id' : 'sensor_id';
+                    selectItem(key, itemId, currentTab);
+                }
+            }, 0);
+        }
+
+        // ============================================================
+        // CRUD OPERATIONS
+        // ============================================================
+
+        function openAddModal() {
+            if (currentTab === 'satellites') {
+                editingId = null;
+                document.getElementById('satelliteModalTitle').textContent = 'Add Satellite';
+                document.getElementById('satelliteForm').reset();
+                document.querySelectorAll('.validation-error').forEach(el => el.textContent = '');
+                document.getElementById('satelliteModal').classList.add('active');
+            } else {
+                showAlert('Sensor CRUD coming soon!', 'info');
+            }
+        }
+
+        function closeSatelliteModal() {
+            document.getElementById('satelliteModal').classList.remove('active');
+            document.getElementById('satelliteForm').reset();
+            editingId = null;
+        }
+
+        function editItem(id) {
+            if (currentTab === 'satellites') {
+                const sat = data.satellites.find(s => s.ID === id || s.norad_id === id);
+                if (!sat) {
+                    showAlert('❌ Satellite not found', 'error');
+                    return;
+                }
+
+                editingId = sat.ID;
+                document.getElementById('satelliteModalTitle').textContent = 'Edit: ' + sat.name;
+                document.getElementById('sat-name').value = sat.name;
+                document.getElementById('sat-norad').value = sat.norad_id;
+                document.getElementById('sat-cospar').value = sat.cospar_id || '';
+                document.getElementById('sat-mission').value = sat.mission || '';
+                document.getElementById('sat-status').value = sat.status || 'Operational';
+                document.getElementById('sat-orbit').value = sat.orbit_type || '';
+                document.getElementById('sat-launch').value = sat.launch_date || '';
+                document.getElementById('sat-sensors').value = sat.sensor_names || '';
+                document.getElementById('satelliteModal').classList.add('active');
+            } else {
+                showAlert('Sensor editing coming soon!', 'info');
+            }
+        }
+
+        function saveSatellite() {
+            const satelliteData = {
+                name: document.getElementById('sat-name').value.trim(),
+                norad_id: document.getElementById('sat-norad').value.trim(),
+                cospar_id: document.getElementById('sat-cospar').value.trim(),
+                mission: document.getElementById('sat-mission').value.trim(),
+                status: document.getElementById('sat-status').value,
+                orbit_type: document.getElementById('sat-orbit').value,
+                launch_date: document.getElementById('sat-launch').value,
+                sensor_names: document.getElementById('sat-sensors').value.trim()
+            };
+
+            // Validation
+            let hasError = false;
+            if (!satelliteData.name) {
+                document.getElementById('error-sat-name').textContent = 'Name is required';
+                hasError = true;
+            } else {
+                document.getElementById('error-sat-name').textContent = '';
+            }
+
+            if (!satelliteData.norad_id) {
+                document.getElementById('error-sat-norad').textContent = 'NORAD ID is required';
+                hasError = true;
+            } else if (!/^\d+$/.test(satelliteData.norad_id)) {
+                document.getElementById('error-sat-norad').textContent = 'NORAD ID must be numeric';
+                hasError = true;
+            } else {
+                document.getElementById('error-sat-norad').textContent = '';
+            }
+
+            if (hasError) {
+                showAlert('❌ Please fix validation errors', 'error');
+                return;
+            }
+
+            if (config.inSharePoint && config.siteUrl) {
+                saveSatelliteToSharePoint(satelliteData);
+            } else {
+                if (editingId) {
+                    const index = data.satellites.findIndex(s => s.ID === editingId);
+                    if (index >= 0) {
+                        data.satellites[index] = { ...data.satellites[index], ...satelliteData };
+                    }
+                } else {
+                    data.satellites.push({
+                        ID: Date.now(),
+                        norad_id: parseInt(satelliteData.norad_id),
+                        ...satelliteData
+                    });
+                }
+                buildSatelliteSensorLinksFromNames();
+                closeSatelliteModal();
+                renderList();
+                showAlert('✅ Satellite saved!', 'success');
+            }
+        }
+
+        function deleteItem(id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+
+            if (currentTab === 'satellites') {
+                if (config.inSharePoint && config.siteUrl) {
+                    const sat = data.satellites.find(s => s.ID === id);
+                    if (sat) {
+                        deleteSatelliteFromSharePoint(sat.ID);
+                    }
+                } else {
+                    data.satellites = data.satellites.filter(s => s.ID !== id);
+                    buildSatelliteSensorLinksFromNames();
+                    selectedItem = null;
+                    renderList();
+                    clearDetails();
+                    showAlert('✅ Satellite deleted!', 'success');
+                }
+            } else {
+                showAlert('Sensor deletion coming soon!', 'info');
+            }
+        }
+
+        // ============================================================
+        // UTILITIES
+        // ============================================================
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        console.log('✅ Satellite Sensor Explorer v5.7.2 loaded and ready');
+    </script>
+</body>
+</html>
