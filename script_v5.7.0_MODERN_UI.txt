@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Sensor Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0f172a;
+            --color-surface: #1e293b;
+            --color-border: #334155;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-primary: #38bdf8;
+            --color-primary-hover: #0284c7;
+            --color-success: #10b981;
+            --color-accent: #a78bfa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+        }
+
+        .header p {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .search-box {
+            padding: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 13px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background-color: rgba(56, 189, 248, 0.1);
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .list-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 13px;
+        }
+
+        .list-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--color-primary);
+        }
+
+        .list-item.active {
+            background-color: rgba(56, 189, 248, 0.15);
+            border-left-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-section {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .details-panel {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--color-bg);
+            overflow-y: auto;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .details-panel h2 {
+            color: var(--color-primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-panel h2 .icon {
+            font-size: 28px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            background-color: var(--color-surface);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .section-title {
+            color: var(--color-accent);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 10px;
+        }
+
+        .relationships-panel {
+            width: 280px;
+            background-color: var(--color-surface);
+            border-left: 1px solid var(--color-border);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .relationships-panel h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .relationship-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-success);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .relationship-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .relationship-item.sensor-type {
+            border-left-color: var(--color-accent);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--color-primary);
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .no-data {
+            padding: 20px;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>🛰️ Explorer</h1>
+                <p>Click to explore relationships</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search satellites/sensors...">
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="satellites">Satellites</button>
+                <button class="tab" data-tab="sensors">Sensors</button>
+            </div>
+
+            <div class="list-container" id="listContainer">
+                <!-- Items will be populated here -->
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="top-section">
+                <!-- DETAILS PANEL -->
+                <div class="details-panel" id="detailsPanel">
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>Select a satellite or sensor to view details</p>
+                    </div>
+                </div>
+
+                <!-- RELATIONSHIPS PANEL -->
+                <div class="relationships-panel" id="relationshipsPanel">
+                    <h3>Relationships</h3>
+                    <div id="relationshipsList" class="no-data">No selection</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data structure - in a real app, this would come from your Excel data
+        const data = {
+            satellites: [
+                { norad_id: 42760, name: "NUSAT-3", constellation: "ALEPH-1", mission: "Earth Observation", purpose: "Optical Imaging", launch_date: "2017-06-15" },
+                { norad_id: 52171, name: "NUSAT-25 (MARIA TELKES)", constellation: "ALEPH-1", mission: "Earth Observation", purpose: "Optical Imaging", launch_date: "2022-04-01" },
+                { norad_id: 52184, name: "NUSAT-26 (M SOMERVILLE)", constellation: "ALEPH-1", mission: "Earth Observation", purpose: "Optical Imaging", launch_date: "2022-04-01" },
+                { norad_id: 43812, name: "GLOBAL-2", constellation: "BLACKSKY", mission: "Earth Observation", purpose: "Optical Imaging", launch_date: "2018-12-03" },
+                { norad_id: 44499, name: "GLOBAL-4", constellation: "BLACKSKY", mission: "Earth Observation", purpose: "Optical Imaging", launch_date: "2019-08-19" },
+                { norad_id: 27424, name: "AQUA", constellation: "Multi-Mission", mission: "Earth Observation", purpose: "Earth Science", launch_date: "2002-05-04" },
+                { norad_id: 25994, name: "TERRA", constellation: "Multi-Mission", mission: "Earth Observation", purpose: "Earth Science", launch_date: "1999-12-18" }
+            ],
+            sensors: [
+                { sensor_id: 1, name: "SAR-C (GF-3)", type: "SAR", description: "C-SAR on GF-3", bands: "N/A", resolution_min: 5, resolution_max: 100, swath_min: 50, swath_max: 400 },
+                { sensor_id: 4, name: "ABI", type: "Multispectral", description: "Advanced Baseline Imager", bands: 16, resolution_min: 500, resolution_max: 2000, swath_min: 2800, swath_max: 2800 },
+                { sensor_id: 11, name: "AIRS", type: "Infrared", description: "Atmospheric Infrared Sounder", bands: 7, resolution_min: 13500, resolution_max: 13500, swath_min: "N/A", swath_max: "N/A" },
+                { sensor_id: 26, name: "AMSR-E", type: "Microwave", description: "Advanced Microwave Scanning Radiometer", bands: 6, resolution_min: 5000, resolution_max: 56000, swath_min: 1450, swath_max: 1450 },
+                { sensor_id: 27, name: "AMSU-A", type: "Microwave", description: "Advanced Microwave Sounding", bands: 15, resolution_min: 45000, resolution_max: 45000, swath_min: "N/A", swath_max: "N/A" },
+                { sensor_id: 33, name: "ASTER", type: "Multispectral", description: "Advanced Spaceborne Thermal Emission", bands: 14, resolution_min: 15, resolution_max: 90, swath_min: 60, swath_max: 60 },
+                { sensor_id: 62, name: "DORIS", type: "Altimeter", description: "Doppler Orbitography and Radiopositioning", bands: 2, resolution_min: "N/A", resolution_max: "N/A", swath_min: "N/A", swath_max: "N/A" }
+            ],
+            satellite_sensor_links: [
+                { norad_id: 27424, sensor_id: 11 },
+                { norad_id: 27424, sensor_id: 26 },
+                { norad_id: 27424, sensor_id: 27 },
+                { norad_id: 27424, sensor_id: 50 },
+                { norad_id: 25994, sensor_id: 33 },
+                { norad_id: 25994, sensor_id: 50 },
+                { norad_id: 52171, sensor_id: 1 },
+                { norad_id: 43812, sensor_id: 4 }
+            ]
+        };
+
+        let currentTab = 'satellites';
+        let selectedItem = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                renderList();
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', renderList);
+
+        function renderList() {
+            const listContainer = document.getElementById('listContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let items = [];
+
+            if (currentTab === 'satellites') {
+                items = data.satellites.filter(s => 
+                    s.name.toLowerCase().includes(searchTerm) || 
+                    s.constellation.toLowerCase().includes(searchTerm)
+                );
+            } else {
+                items = data.sensors.filter(s => 
+                    s.name.toLowerCase().includes(searchTerm) || 
+                    s.type.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            listContainer.innerHTML = items.map(item => {
+                const key = currentTab === 'satellites' ? 'norad_id' : 'sensor_id';
+                const displayText = currentTab === 'satellites' ? 
+                    `${item.name} (${item.constellation})` : 
+                    `${item.name} (${item.type})`;
+                
+                return `<div class="list-item" onclick="selectItem('${key}', ${item[key]}, '${currentTab}')">${displayText}</div>`;
+            }).join('');
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<div class="no-data">No results found</div>';
+            }
+        }
+
+        function selectItem(key, value, type) {
+            selectedItem = { type, key, value };
+            
+            // Update active state
+            document.querySelectorAll('.list-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            displayDetails();
+            displayRelationships();
+        }
+
+        function displayDetails() {
+            const detailsPanel = document.getElementById('detailsPanel');
+            const type = selectedItem.type;
+            const key = selectedItem.key;
+            const value = selectedItem.value;
+
+            let item, html;
+
+            if (type === 'satellites') {
+                item = data.satellites.find(s => s.norad_id === value);
+                html = `
+                    <h2><span class="icon">🛰️</span>${item.name}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">NORAD ID</div>
+                            <div class="detail-value">${item.norad_id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Constellation</div>
+                            <div class="detail-value">${item.constellation}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Mission Type</div>
+                            <div class="detail-value">${item.mission}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Purpose</div>
+                            <div class="detail-value">${item.purpose}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Mission Information</div>
+                    <div class="detail-item">
+                        <div class="detail-label">Launch Date</div>
+                        <div class="detail-value">${item.launch_date}</div>
+                    </div>
+                `;
+            } else {
+                item = data.sensors.find(s => s.sensor_id === value);
+                html = `
+                    <h2><span class="icon">📡</span>${item.name}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Type</div>
+                            <div class="detail-value">${item.type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Bands</div>
+                            <div class="detail-value">${item.bands || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Specifications</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Resolution (Min)</div>
+                            <div class="detail-value">${item.resolution_min}m</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Resolution (Max)</div>
+                            <div class="detail-value">${item.resolution_max}m</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Swath (Min)</div>
+                            <div class="detail-value">${item.swath_min} km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Swath (Max)</div>
+                            <div class="detail-value">${item.swath_max} km</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Description</div>
+                    <div class="detail-item">
+                        <div class="detail-value">${item.description}</div>
+                    </div>
+                `;
+            }
+
+            detailsPanel.innerHTML = html;
+        }
+
+        function displayRelationships() {
+            const relationshipsList = document.getElementById('relationshipsList');
+            const type = selectedItem.type;
+            const value = selectedItem.value;
+
+            let relationships = [];
+
+            if (type === 'satellites') {
+                const satLinks = data.satellite_sensor_links.filter(link => link.norad_id === value);
+                relationships = satLinks.map(link => {
+                    const sensor = data.sensors.find(s => s.sensor_id === link.sensor_id);
+                    return { 
+                        name: sensor.name, 
+                        type: sensor.type, 
+                        id: sensor.sensor_id,
+                        relType: 'sensor',
+                        clickType: 'sensors'
+                    };
+                });
+            } else {
+                const sensorLinks = data.satellite_sensor_links.filter(link => link.sensor_id === value);
+                relationships = sensorLinks.map(link => {
+                    const sat = data.satellites.find(s => s.norad_id === link.norad_id);
+                    return { 
+                        name: sat.name, 
+                        type: sat.constellation, 
+                        id: sat.norad_id,
+                        relType: 'satellite',
+                        clickType: 'satellites'
+                    };
+                });
+            }
+
+            if (relationships.length === 0) {
+                relationshipsList.innerHTML = '<div class="no-data">No relationships found</div>';
+                return;
+            }
+
+            relationshipsList.innerHTML = `<div style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: 10px;">${relationships.length} linked ${type === 'satellites' ? 'sensors' : 'satellites'}</div>` +
+                relationships.map(rel => 
+                    `<div class="relationship-item ${rel.relType === 'sensor' ? 'sensor-type' : ''}" 
+                        onclick="switchAndSelect('${rel.clickType}', ${rel.id})">
+                        <strong>${rel.name}</strong><br/>
+                        <small style="color: var(--color-text-secondary);">${rel.type}</small>
+                    </div>`
+                ).join('');
+        }
+
+        function switchAndSelect(tabName, itemId) {
+            // Switch tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            currentTab = tabName;
+            
+            // Render list and auto-select
+            renderList();
+            setTimeout(() => {
+                const itemToSelect = currentTab === 'satellites' ? 
+                    data.satellites.find(s => s.norad_id === itemId) :
+                    data.sensors.find(s => s.sensor_id === itemId);
+                
+                const items = document.querySelectorAll('.list-item');
+                const displayText = currentTab === 'satellites' ? 
+                    `${itemToSelect.name} (${itemToSelect.constellation})` :
+                    `${itemToSelect.name} (${itemToSelect.type})`;
+                
+                const targetItem = Array.from(items).find(item => item.textContent.includes(displayText));
+                if (targetItem) {
+                    targetItem.click();
+                }
+            }, 0);
+        }
+
+        // Initial render
+        renderList();
+    </script>
+</body>
+</html>
