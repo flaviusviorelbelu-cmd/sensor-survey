@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Sensor Explorer v5.7.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0f172a;
+            --color-surface: #1e293b;
+            --color-border: #334155;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-primary: #38bdf8;
+            --color-primary-hover: #0284c7;
+            --color-success: #10b981;
+            --color-accent: #a78bfa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+        }
+
+        .header p {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--color-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .search-box {
+            padding: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 13px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background-color: rgba(56, 189, 248, 0.1);
+        }
+
+        .filter-controls {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .filter-btn.active {
+            background-color: rgba(56, 189, 248, 0.2);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .list-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 13px;
+        }
+
+        .list-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--color-primary);
+        }
+
+        .list-item.active {
+            background-color: rgba(56, 189, 248, 0.15);
+            border-left-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .list-item-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .list-item-meta {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-section {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .details-panel {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--color-bg);
+            overflow-y: auto;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .details-panel h2 {
+            color: var(--color-primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-panel h2 .icon {
+            font-size: 28px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            background-color: var(--color-surface);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .section-title {
+            color: var(--color-accent);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 10px;
+        }
+
+        .relationships-panel {
+            width: 280px;
+            background-color: var(--color-surface);
+            border-left: 1px solid var(--color-border);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .relationships-panel h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .relationships-count {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .relationship-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-success);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .relationship-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .relationship-item.sensor-type {
+            border-left-color: var(--color-accent);
+        }
+
+        .rel-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .rel-type {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--color-primary);
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .no-data {
+            padding: 20px;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .sensor-count-badge {
+            display: inline-block;
+            background-color: rgba(167, 139, 250, 0.2);
+            color: var(--color-accent);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>🛰️ Explorer</h1>
+                <p>Satellites & Sensors</p>
+                <div class="version-badge">v5.7.0</div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search satellites/sensors...">
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="satellites">Satellites</button>
+                <button class="tab" data-tab="sensors">Sensors</button>
+            </div>
+
+            <div class="filter-controls" id="filterControls" style="display: none;">
+                <!-- Filters populated by JS -->
+            </div>
+
+            <div class="list-container" id="listContainer">
+                <!-- Items will be populated here -->
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="top-section">
+                <!-- DETAILS PANEL -->
+                <div class="details-panel" id="detailsPanel">
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>Select a satellite or sensor to view details</p>
+                    </div>
+                </div>
+
+                <!-- RELATIONSHIPS PANEL -->
+                <div class="relationships-panel" id="relationshipsPanel">
+                    <h3>Relationships</h3>
+                    <div id="relationshipsList" class="no-data">No selection</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * SATELLITE SENSOR EXPLORER v5.7.0
+         * 
+         * Data Model:
+         * - satellites: Array of satellite objects with norad_id as key
+         * - sensors: Array of sensor objects with sensor_id as key
+         * - satellite_sensor_links: Array of {norad_id, sensor_id} link objects
+         * 
+         * This normalized structure allows:
+         * - Clean many-to-many relationships
+         * - Easy CSV import/export from satellite_sensor tab
+         * - Bi-directional navigation (sat->sensors, sensor->sats)
+         */
+
+        const data = {
+            satellites: [
+                {
+                    norad_id: 42760,
+                    name: "NUSAT-3",
+                    cospar_id: "2017-040A",
+                    constellation: "ALEPH-1",
+                    mission: "Earth Observation",
+                    orbit_type: "SSO",
+                    status: "Operational",
+                    launch_date: "2017-06-15"
+                },
+                {
+                    norad_id: 52171,
+                    name: "NUSAT-25 (MARIA TELKES)",
+                    cospar_id: "2022-024A",
+                    constellation: "ALEPH-1",
+                    mission: "Earth Observation",
+                    orbit_type: "SSO",
+                    status: "Operational",
+                    launch_date: "2022-04-01"
+                },
+                {
+                    norad_id: 52184,
+                    name: "NUSAT-26 (M SOMERVILLE)",
+                    cospar_id: "2022-024K",
+                    constellation: "ALEPH-1",
+                    mission: "Earth Observation",
+                    orbit_type: "SSO",
+                    status: "Operational",
+                    launch_date: "2022-04-01"
+                },
+                {
+                    norad_id: 43812,
+                    name: "GLOBAL-2",
+                    cospar_id: "2018-102A",
+                    constellation: "BLACKSKY",
+                    mission: "Earth Observation",
+                    orbit_type: "LEO",
+                    status: "Operational",
+                    launch_date: "2018-12-03"
+                },
+                {
+                    norad_id: 44499,
+                    name: "GLOBAL-4",
+                    cospar_id: "2019-056A",
+                    constellation: "BLACKSKY",
+                    mission: "Earth Observation",
+                    orbit_type: "LEO",
+                    status: "Operational",
+                    launch_date: "2019-08-19"
+                },
+                {
+                    norad_id: 27424,
+                    name: "AQUA",
+                    cospar_id: "2002-022A",
+                    constellation: "Multi-Mission",
+                    mission: "METOC",
+                    orbit_type: "SSO",
+                    status: "Operational",
+                    launch_date: "2002-05-04"
+                },
+                {
+                    norad_id: 25994,
+                    name: "TERRA",
+                    cospar_id: "1999-071A",
+                    constellation: "Multi-Mission",
+                    mission: "METOC",
+                    orbit_type: "SSO",
+                    status: "Operational",
+                    launch_date: "1999-12-18"
+                }
+            ],
+            sensors: [
+                {
+                    sensor_id: 1,
+                    name: "SAR-C (GF-3)",
+                    type: "SAR",
+                    description: "Synthetic Aperture Radar - X-band for high-resolution imaging",
+                    bands: 1,
+                    resolution_min: 5,
+                    resolution_max: 100,
+                    swath_min: 50,
+                    swath_max: 400
+                },
+                {
+                    sensor_id: 4,
+                    name: "ABI",
+                    type: "Multispectral",
+                    description: "Advanced Baseline Imager",
+                    bands: 16,
+                    resolution_min: 500,
+                    resolution_max: 2000,
+                    swath_min: 2800,
+                    swath_max: 2800
+                },
+                {
+                    sensor_id: 11,
+                    name: "AIRS",
+                    type: "Infrared",
+                    description: "Atmospheric Infrared Sounder",
+                    bands: 7,
+                    resolution_min: 13500,
+                    resolution_max: 13500,
+                    swath_min: "N/A",
+                    swath_max: "N/A"
+                },
+                {
+                    sensor_id: 26,
+                    name: "AMSR-E",
+                    type: "Microwave",
+                    description: "Advanced Microwave Scanning Radiometer",
+                    bands: 6,
+                    resolution_min: 5000,
+                    resolution_max: 56000,
+                    swath_min: 1450,
+                    swath_max: 1450
+                },
+                {
+                    sensor_id: 27,
+                    name: "AMSU-A",
+                    type: "Microwave",
+                    description: "Advanced Microwave Sounding Unit",
+                    bands: 15,
+                    resolution_min: 45000,
+                    resolution_max: 45000,
+                    swath_min: "N/A",
+                    swath_max: "N/A"
+                },
+                {
+                    sensor_id: 33,
+                    name: "ASTER",
+                    type: "Multispectral",
+                    description: "Advanced Spaceborne Thermal Emission and Reflection Radiometer",
+                    bands: 14,
+                    resolution_min: 15,
+                    resolution_max: 90,
+                    swath_min: 60,
+                    swath_max: 60
+                },
+                {
+                    sensor_id: 62,
+                    name: "DORIS",
+                    type: "Altimeter",
+                    description: "Doppler Orbitography and Radiopositioning Integrated on Satellite",
+                    bands: 2,
+                    resolution_min: "N/A",
+                    resolution_max: "N/A",
+                    swath_min: "N/A",
+                    swath_max: "N/A"
+                }
+            ],
+            // Normalized link table: maps satellites to sensors (from Excel satellite_sensor tab)
+            satellite_sensor_links: [
+                { norad_id: 27424, sensor_id: 11 },
+                { norad_id: 27424, sensor_id: 26 },
+                { norad_id: 27424, sensor_id: 27 },
+                { norad_id: 25994, sensor_id: 33 },
+                { norad_id: 52171, sensor_id: 1 },
+                { norad_id: 43812, sensor_id: 4 }
+            ]
+        };
+
+        let currentTab = 'satellites';
+        let selectedItem = null;
+        let currentFilter = null;
+
+        // ============================================================
+        // TAB AND FILTER MANAGEMENT
+        // ============================================================
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                currentFilter = null;
+                renderFilterControls();
+                renderList();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', renderList);
+
+        function renderFilterControls() {
+            const filterControls = document.getElementById('filterControls');
+            const filters = [];
+
+            if (currentTab === 'satellites') {
+                // Satellite filters: Status, Orbit Type, Constellation
+                const statuses = [...new Set(data.satellites.map(s => s.status).filter(Boolean))];
+                const orbits = [...new Set(data.satellites.map(s => s.orbit_type).filter(Boolean))];
+
+                filters.push({ label: 'All', type: 'status', value: null });
+                statuses.forEach(status => {
+                    filters.push({ label: status, type: 'status', value: status });
+                });
+                orbits.forEach(orbit => {
+                    filters.push({ label: orbit, type: 'orbit', value: orbit });
+                });
+            } else {
+                // Sensor filters: Type
+                const types = [...new Set(data.sensors.map(s => s.type).filter(Boolean))];
+                filters.push({ label: 'All', type: 'all', value: null });
+                types.forEach(type => {
+                    filters.push({ label: type, type: 'type', value: type });
+                });
+            }
+
+            filterControls.innerHTML = filters
+                .map(f => `<button class="filter-btn" onclick="setFilter('${f.type}', ${f.value ? `'${f.value}'` : 'null'})">
+                    ${f.label}
+                </button>`)
+                .join('');
+            filterControls.style.display = filters.length > 0 ? 'flex' : 'none';
+        }
+
+        function setFilter(type, value) {
+            currentFilter = value;
+            renderList();
+        }
+
+        // ============================================================
+        // LIST RENDERING
+        // ============================================================
+
+        function renderList() {
+            const listContainer = document.getElementById('listContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let items = [];
+
+            if (currentTab === 'satellites') {
+                items = data.satellites
+                    .filter(s => {
+                        const matchesSearch = s.name.toLowerCase().includes(searchTerm) ||
+                            s.constellation.toLowerCase().includes(searchTerm) ||
+                            s.norad_id.toString().includes(searchTerm);
+                        const matchesFilter = !currentFilter || s.status === currentFilter || s.orbit_type === currentFilter;
+                        return matchesSearch && matchesFilter;
+                    })
+                    .map(item => ({
+                        ...item,
+                        sensorCount: data.satellite_sensor_links.filter(l => l.norad_id === item.norad_id).length
+                    }));
+            } else {
+                items = data.sensors
+                    .filter(s => {
+                        const matchesSearch = s.name.toLowerCase().includes(searchTerm) ||
+                            s.type.toLowerCase().includes(searchTerm) ||
+                            s.sensor_id.toString().includes(searchTerm);
+                        const matchesFilter = !currentFilter || s.type === currentFilter;
+                        return matchesSearch && matchesFilter;
+                    })
+                    .map(item => ({
+                        ...item,
+                        satelliteCount: data.satellite_sensor_links.filter(l => l.sensor_id === item.sensor_id).length
+                    }));
+            }
+
+            listContainer.innerHTML = items.map(item => {
+                const key = currentTab === 'satellites' ? 'norad_id' : 'sensor_id';
+                const itemId = item[key];
+                const count = currentTab === 'satellites' ? item.sensorCount : item.satelliteCount;
+                const countLabel = currentTab === 'satellites' ? 'sensors' : 'satellites';
+
+                return `
+                    <div class="list-item" onclick="selectItem('${key}', ${itemId}, '${currentTab}')">
+                        <div class="list-item-title">${item.name}</div>
+                        <div class="list-item-meta">
+                            ${currentTab === 'satellites' ?
+                                `${item.constellation} • ${item.orbit_type}` :
+                                `${item.type}`
+                            }
+                            <span class="sensor-count-badge">${count} ${countLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<div class="no-data">No results found</div>';
+            }
+        }
+
+        // ============================================================
+        // SELECTION AND DETAILS
+        // ============================================================
+
+        function selectItem(key, value, type) {
+            selectedItem = { type, key, value };
+
+            // Update active state
+            document.querySelectorAll('.list-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.list-item').classList.add('active');
+
+            displayDetails();
+            displayRelationships();
+        }
+
+        function displayDetails() {
+            const detailsPanel = document.getElementById('detailsPanel');
+            const type = selectedItem.type;
+            const value = selectedItem.value;
+
+            let item, html;
+
+            if (type === 'satellites') {
+                item = data.satellites.find(s => s.norad_id === value);
+                html = `
+                    <h2><span class="icon">🛰️</span>${item.name}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">NORAD ID</div>
+                            <div class="detail-value">${item.norad_id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">COSPAR ID</div>
+                            <div class="detail-value">${item.cospar_id || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">${item.status}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Orbit Type</div>
+                            <div class="detail-value">${item.orbit_type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Mission</div>
+                            <div class="detail-value">${item.mission}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Constellation</div>
+                            <div class="detail-value">${item.constellation}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Mission Information</div>
+                    <div class="detail-item">
+                        <div class="detail-label">Launch Date</div>
+                        <div class="detail-value">${item.launch_date}</div>
+                    </div>
+                `;
+            } else {
+                item = data.sensors.find(s => s.sensor_id === value);
+                html = `
+                    <h2><span class="icon">📡</span>${item.name}</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Sensor Type</div>
+                            <div class="detail-value">${item.type}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Number of Bands</div>
+                            <div class="detail-value">${item.bands || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Specifications</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Resolution (m)</div>
+                            <div class="detail-value">${item.resolution_min} – ${item.resolution_max}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Swath Width (km)</div>
+                            <div class="detail-value">${item.swath_min} – ${item.swath_max}</div>
+                        </div>
+                    </div>
+                    <div class="section-title">Description</div>
+                    <div class="detail-item">
+                        <div class="detail-value">${item.description}</div>
+                    </div>
+                `;
+            }
+
+            detailsPanel.innerHTML = html;
+        }
+
+        // ============================================================
+        // RELATIONSHIPS (Normalized via satellite_sensor_links)
+        // ============================================================
+
+        function displayRelationships() {
+            const relationshipsList = document.getElementById('relationshipsList');
+            const type = selectedItem.type;
+            const value = selectedItem.value;
+
+            let relationships = [];
+
+            if (type === 'satellites') {
+                // Satellite -> Sensors: Find all links for this NORAD ID
+                const satLinks = data.satellite_sensor_links.filter(
+                    link => link.norad_id === value
+                );
+
+                // Deduplicate and map to sensor objects
+                const seen = new Set();
+                relationships = satLinks
+                    .map(link => data.sensors.find(s => s.sensor_id === link.sensor_id))
+                    .filter(sensor => sensor && !seen.has(sensor.sensor_id) && seen.add(sensor.sensor_id))
+                    .map(sensor => ({
+                        name: sensor.name,
+                        type: sensor.type,
+                        id: sensor.sensor_id,
+                        relType: 'sensor',
+                        clickType: 'sensors'
+                    }));
+            } else {
+                // Sensor -> Satellites: Find all links for this sensor ID
+                const sensorLinks = data.satellite_sensor_links.filter(
+                    link => link.sensor_id === value
+                );
+
+                // Deduplicate and map to satellite objects
+                const seen = new Set();
+                relationships = sensorLinks
+                    .map(link => data.satellites.find(s => s.norad_id === link.norad_id))
+                    .filter(sat => sat && !seen.has(sat.norad_id) && seen.add(sat.norad_id))
+                    .map(sat => ({
+                        name: sat.name,
+                        type: sat.constellation,
+                        id: sat.norad_id,
+                        relType: 'satellite',
+                        clickType: 'satellites'
+                    }));
+            }
+
+            if (relationships.length === 0) {
+                relationshipsList.innerHTML = '<div class="no-data">No relationships found</div>';
+                return;
+            }
+
+            const label = type === 'satellites' ? 'sensors' : 'satellites';
+
+            relationshipsList.innerHTML =
+                `<div class="relationships-count">${relationships.length} linked ${label}</div>` +
+                relationships.map(rel =>
+                    `<div class="relationship-item ${rel.relType === 'sensor' ? 'sensor-type' : ''}"
+                        onclick="switchAndSelect('${rel.clickType}', ${rel.id})">
+                        <div class="rel-title">${rel.name}</div>
+                        <div class="rel-type">${rel.type}</div>
+                    </div>`
+                ).join('');
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        function switchAndSelect(tabName, itemId) {
+            // Switch tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            currentTab = tabName;
+            currentFilter = null;
+
+            // Render list and auto-select
+            renderFilterControls();
+            renderList();
+            setTimeout(() => {
+                const itemToSelect = currentTab === 'satellites' ?
+                    data.satellites.find(s => s.norad_id === itemId) :
+                    data.sensors.find(s => s.sensor_id === itemId);
+
+                const items = document.querySelectorAll('.list-item');
+                const targetItem = Array.from(items).find(item =>
+                    item.querySelector('.list-item-title').textContent === itemToSelect.name
+                );
+
+                if (targetItem) {
+                    targetItem.click();
+                }
+            }, 0);
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+
+        // Initial render
+        renderFilterControls();
+        renderList();
+    </script>
+</body>
+</html>
