@@ -1620,6 +1620,80 @@ function attachEventListeners() {
                 e.stopPropagation();
             });
     }
+
+    // Import button
+    const importBtn=document.getElementById('importBtn');
+
+    if (importBtn) {
+        importBtn.addEventListener('click', (e)=> {
+                e.preventDefault();
+                e.stopPropagation();
+                openImportModal();
+                return false;
+            });
+    }
+
+    // Link button
+    const linkBtn=document.getElementById('linkBtn');
+
+    if (linkBtn) {
+        linkBtn.addEventListener('click', (e)=> {
+                e.preventDefault();
+                e.stopPropagation();
+                openLinkModal();
+                return false;
+            });
+    }
+
+    // CSV file input
+    const csvFileInput=document.getElementById('csvFileInput');
+
+    if (csvFileInput) {
+        csvFileInput.addEventListener('change', handleFileSelect);
+    }
+
+    // Drop zone
+    const dropZone=document.getElementById('dropZone');
+
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e)=> {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+        dropZone.addEventListener('dragleave', ()=> {
+                dropZone.classList.remove('drag-over');
+            });
+
+        dropZone.addEventListener('drop', (e)=> {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files=e.dataTransfer.files;
+
+                if (files.length > 0) {
+                    document.getElementById('csvFileInput').files=files;
+
+                    handleFileSelect({
+                        target: {
+                            files: files
+                        }
+                    });
+            }
+        });
+}
+
+// Mission dropdown change handler
+const linkMission=document.getElementById('linkMission');
+
+if (linkMission) {
+    linkMission.addEventListener('change', (e)=> {
+            const newMissionInput=document.getElementById('newMissionName');
+
+            if (newMissionInput) {
+                newMissionInput.style.display=e.target.value==='__NEW__' ? 'block' : 'none';
+            }
+        });
+}
 }
 
 // ============================================================
@@ -2370,6 +2444,718 @@ function deleteItem(id) {
 }
 
 // ============================================================
+// MISSION & JUNCTION TABLE FUNCTIONS
+// ============================================================
+
+// State for missions and junction data
+let missionsData=[];
+let junctionData=[];
+let importedRows=[];
+
+async function loadMissions() {
+    if ( !config.inSharePoint || !config.siteUrl) {
+        missionsData=[];
+        return;
+    }
+
+    try {
+        const url=config.siteUrl+"/_api/web/lists/getbytitle('"+config.missionList+"')/items?$select=ID,Title,Description&$top=5000";
+
+        const response=await fetch(url, {
+
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json;odata=verbose'
+            }
+
+            ,
+            credentials: 'include',
+            signal: AbortSignal.timeout(config.apiTimeout)
+        });
+
+    if ( !response.ok) throw new Error('HTTP ' + response.status);
+
+    const result=await response.json();
+
+    missionsData=(result && result.d && result.d.results ? result.d.results : []).map(function(item) {
+            return {
+                id: item.ID,
+                name: item.Title || 'Unknown',
+                description: item.Description || ''
+            }
+
+            ;
+        });
+
+    console.log('✅ Loaded ' + missionsData.length + ' missions from SharePoint');
+}
+
+catch (error) {
+    console.warn('Mission list not found:', error.message);
+    missionsData=[];
+}
+}
+
+async function loadJunctionTable() {
+    if ( !config.inSharePoint || !config.siteUrl) {
+        junctionData=[];
+        return;
+    }
+
+    try {
+        var url=config.siteUrl+"/_api/web/lists/getbytitle('"+config.junctionList+"')/items?$select=ID,Title,SatelliteId,SensorId,MissionId,Notes&$top=5000";
+
+        var response=await fetch(url, {
+
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json;odata=verbose'
+            }
+
+            ,
+            credentials: 'include',
+            signal: AbortSignal.timeout(config.apiTimeout)
+        });
+
+    if ( !response.ok) throw new Error('HTTP ' + response.status);
+
+    var result=await response.json();
+
+    junctionData=(result && result.d && result.d.results ? result.d.results : []).map(function(item) {
+            return {
+                id: item.ID,
+                title: item.Title,
+                satelliteId: item.SatelliteId,
+                sensorId: item.SensorId,
+                missionId: item.MissionId,
+                notes: item.Notes || ''
+            }
+
+            ;
+        });
+
+    console.log('✅ Loaded ' + junctionData.length + ' junction records from SharePoint');
+}
+
+catch (error) {
+    console.warn('Junction table not found:', error.message);
+    junctionData=[];
+}
+}
+
+async function getDigestToken() {
+    var contextUrl=config.siteUrl+'/_api/contextinfo';
+
+    var digestResponse=await fetch(contextUrl, {
+
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json;odata=verbose'
+        }
+
+        ,
+        credentials: 'include',
+        signal: AbortSignal.timeout(config.apiTimeout)
+    });
+
+if ( !digestResponse.ok) throw new Error('Failed to get digest');
+var digestData=await digestResponse.json();
+return digestData && digestData.d && digestData.d.GetContextWebInformation ? digestData.d.GetContextWebInformation.FormDigestValue : null;
+}
+
+async function createMission(missionName) {
+    var digest=await getDigestToken();
+    var url=config.siteUrl+"/_api/web/lists/getbytitle('"+config.missionList+"')/items";
+
+    var response=await fetch(url, {
+
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json;odata=verbose',
+            'Content-Type': 'application/json;odata=verbose',
+            'X-RequestDigest': digest
+        }
+
+        ,
+        body: JSON.stringify({
+            '__metadata': {
+                'type': 'SP.Data.MissionListItem'
+            }
+
+            ,
+            'Title': missionName
+        }),
+    credentials: 'include',
+    signal: AbortSignal.timeout(config.apiTimeout)
+});
+
+if ( !response.ok) throw new Error('Failed to create mission: HTTP ' + response.status);
+var result=await response.json();
+return result && result.d ? result.d.ID : null;
+}
+
+async function createJunctionRecord(satelliteId, sensorId, missionId, notes) {
+    notes=notes || '';
+    var digest=await getDigestToken();
+    var url=config.siteUrl+"/_api/web/lists/getbytitle('"+config.junctionList+"')/items";
+
+    // Build title from names
+    var sat=null,
+    sen=null,
+    mis=null;
+
+    for (var i=0; i < data.satellites.length; i++) {
+        if (data.satellites[i].ID===satelliteId) {
+            sat=data.satellites[i];
+            break;
+        }
+    }
+
+    for (var j=0; j < data.sensors.length; j++) {
+        if (data.sensors[j].sensor_id===sensorId) {
+            sen=data.sensors[j];
+            break;
+        }
+    }
+
+    for (var k=0; k < missionsData.length; k++) {
+        if (missionsData[k].id===missionId) {
+            mis=missionsData[k];
+            break;
+        }
+    }
+
+    var title=(sat ? sat.name : 'Unknown')+' - '+(sen ? sen.name : 'Unknown')+' - '+(mis ? mis.name : 'Unknown');
+
+    var response=await fetch(url, {
+
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json;odata=verbose',
+            'Content-Type': 'application/json;odata=verbose',
+            'X-RequestDigest': digest
+        }
+
+        ,
+        body: JSON.stringify({
+            '__metadata': {
+                'type': 'SP.Data.Satellite_x005f_Sensor_x005f_MissionListItem'
+            }
+
+            ,
+            'Title': title,
+            'SatelliteId': satelliteId,
+            'SensorId': sensorId,
+            'MissionId': missionId,
+            'Notes': notes
+        }),
+    credentials: 'include',
+    signal: AbortSignal.timeout(config.apiTimeout)
+});
+
+if ( !response.ok) throw new Error('Failed to create junction: HTTP ' + response.status);
+return true;
+}
+
+function checkJunctionExists(satelliteId, sensorId, missionId) {
+    for (var i=0; i < junctionData.length; i++) {
+        var j=junctionData[i];
+
+        if (j.satelliteId===satelliteId && j.sensorId===sensorId && j.missionId===missionId) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// ============================================================
+// IMPORT MODAL FUNCTIONS
+// ============================================================
+
+function openImportModal() {
+    const modal=document.getElementById('importModal');
+    if (modal) modal.classList.add('active');
+    resetImport();
+}
+
+function closeImportModal() {
+    const modal=document.getElementById('importModal');
+    if (modal) modal.classList.remove('active');
+    resetImport();
+}
+
+function resetImport() {
+    // Reset to step 1
+    document.getElementById('importStep1')?.classList.remove('hidden');
+    document.getElementById('importStep2')?.classList.add('hidden');
+    document.getElementById('importStep3')?.classList.add('hidden');
+
+    // Clear file input
+    const fileInput=document.getElementById('csvFileInput');
+    if (fileInput) fileInput.value='';
+
+    // Hide file info
+    document.getElementById('fileInfo')?.classList.remove('visible');
+    document.getElementById('previewSection')?.classList.add('hidden');
+
+    // Disable import button
+    const importBtn=document.getElementById('startImportBtn');
+    if (importBtn) importBtn.disabled=true;
+
+    // Clear preview
+    document.getElementById('previewHead').innerHTML='';
+    document.getElementById('previewBody').innerHTML='';
+    document.getElementById('resultsBody').innerHTML='';
+
+    importedRows=[];
+}
+
+function clearImportFile() {
+    const fileInput=document.getElementById('csvFileInput');
+    if (fileInput) fileInput.value='';
+
+    document.getElementById('fileInfo')?.classList.remove('visible');
+    document.getElementById('previewSection')?.classList.add('hidden');
+
+    const importBtn=document.getElementById('startImportBtn');
+    if (importBtn) importBtn.disabled=true;
+
+    importedRows=[];
+}
+
+function handleFileSelect(event) {
+    const file=event.target.files[0];
+    if ( !file) return;
+
+    if ( !file.name.endsWith ('.csv')) {
+        showAlert('❌ Please select a CSV file', 'error');
+        return;
+    }
+
+    // Show file info
+    const fileInfo=document.getElementById('fileInfo');
+    const fileName=document.getElementById('fileName');
+
+    if (fileInfo && fileName) {
+        fileInfo.classList.add('visible');
+
+        fileName.textContent=`$ {
+            file.name
+        }
+
+        ($ {
+                (file.size / 1024).toFixed(1)
+            }
+
+            KB)`;
+    }
+
+    // Read and parse CSV
+    const reader=new FileReader();
+
+    reader.onload=function(e) {
+        const content=e.target.result;
+        parseCSV(content);
+    }
+
+    ;
+    reader.readAsText(file);
+}
+
+function parseCSV(content) {
+    const lines=content.split(/\r?\n/).filter(line=> line.trim());
+
+    if (lines.length < 2) {
+        showAlert('❌ CSV must have headers and at least one data row', 'error');
+        return;
+    }
+
+    const headers=lines[0].split(',').map(h=> h.trim().replace(/"/g, ''));
+ const rows=[];
+
+            for (let i=1; i < lines.length; i++) {
+                const values=lines[i].split(',').map(v=> v.trim().replace(/"/g, ''));
+ if (values.length >=headers.length) {
+                            const row= {}
+
+                            ;
+
+                            headers.forEach((header, index)=> {
+                                    row[header]=values[index] || '';
+                                });
+                            rows.push(row);
+                        }
+                    }
+
+                    importedRows=rows;
+
+                    // Show preview
+                    const previewSection=document.getElementById('previewSection');
+                    const previewHead=document.getElementById('previewHead');
+                    const previewBody=document.getElementById('previewBody');
+                    const totalRowsInfo=document.getElementById('totalRowsInfo');
+
+                    if (previewSection && previewHead && previewBody) {
+                        previewSection.classList.remove('hidden');
+
+                        previewHead.innerHTML=`<tr>$ {
+                            headers.map(h=> `<th>$ {
+                                    escapeHtml(h)
+                                }
+
+                                </th>`).join('')
+                        }
+
+                        </tr>`;
+
+                        const previewRows=rows.slice(0, 10);
+
+                        previewBody.innerHTML=previewRows.map(row=> `<tr>$ {
+                                headers.map(h=> `<td>$ {
+                                        escapeHtml(row[h] || '-')
+                                    }
+
+                                    </td>`).join('')
+                            }
+
+                            </tr>`).join('');
+
+                        if (totalRowsInfo) {
+                            totalRowsInfo.textContent=`Total rows: $ {
+                                rows.length
+                            }
+
+                            `;
+                        }
+                    }
+
+                    // Enable import button
+                    const importBtn=document.getElementById('startImportBtn');
+                    if (importBtn) importBtn.disabled=false;
+                }
+
+                async function startImport() {
+                    if (importedRows.length===0) {
+                        showAlert('❌ No data to import', 'error');
+                        return;
+                    }
+
+                    // Switch to step 2
+                    document.getElementById('importStep1')?.classList.add('hidden');
+                    document.getElementById('importStep2')?.classList.remove('hidden');
+
+                    const progressBar=document.getElementById('importProgress');
+                    const statusText=document.getElementById('importStatus');
+
+                    // Load missions first
+                    await loadMissions();
+                    await loadJunctionTable();
+
+                    let successCount=0;
+                    let skipCount=0;
+                    let errorCount=0;
+                    const results=[];
+
+                    for (let i=0; i < importedRows.length; i++) {
+                        const row=importedRows[i];
+                        const satelliteName=row['SatelliteName'] || row['Satellite'] || row['satellite'];
+                        const sensorName=row['SensorName'] || row['Sensor'] || row['sensor'];
+                        const missionName=row['MissionName'] || row['Mission'] || row['mission'];
+
+                        // Update progress
+                        const progress=Math.round(((i + 1) / importedRows.length) * 100);
+                        if (progressBar) progressBar.style.width=progress + '%';
+                        if (progressBar) progressBar.textContent=progress + '%';
+
+                        if (statusText) statusText.textContent=`Processing row $ {
+                            i + 1
+                        }
+
+                        of $ {
+                            importedRows.length
+                        }
+
+                        ...`;
+
+                        try {
+                            // Lookup satellite
+                            const satellite=data.satellites.find(s=> s.name.toLowerCase()===satelliteName?.toLowerCase());
+
+                            if ( !satellite) {
+                                results.push({
+                                    row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'error', message: 'Satellite not found'
+                                });
+                            errorCount++;
+                            continue;
+                        }
+
+                        // Lookup sensor
+                        const sensor=data.sensors.find(s=> s.name.toLowerCase()===sensorName?.toLowerCase());
+
+                        if ( !sensor) {
+                            results.push({
+                                row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'error', message: 'Sensor not found'
+                            });
+                        errorCount++;
+                        continue;
+                    }
+
+                    // Lookup or create mission
+                    let mission=missionsData.find(m=> m.name.toLowerCase()===missionName?.toLowerCase());
+
+                    if ( !mission && missionName && config.inSharePoint) {
+                        const newMissionId=await createMission(missionName);
+
+                        mission= {
+                            id: newMissionId, name: missionName
+                        }
+
+                        ;
+                        missionsData.push(mission);
+                    }
+
+                    if ( !mission) {
+                        results.push({
+                            row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'error', message: 'Mission not found or created'
+                        });
+                    errorCount++;
+                    continue;
+                }
+
+                // Check if junction exists
+                const exists=await checkJunctionExists(satellite.ID, sensor.sensor_id, mission.id);
+
+                if (exists) {
+                    results.push({
+                        row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'skip', message: 'Already exists'
+                    });
+                skipCount++;
+                continue;
+            }
+
+            // Create junction record
+            if (config.inSharePoint) {
+                await createJunctionRecord(satellite.ID, sensor.sensor_id, mission.id);
+            }
+
+            results.push({
+                row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'success', message: 'Created'
+            });
+        successCount++;
+
+    }
+
+    catch (error) {
+        results.push({
+            row: i + 1, satellite: satelliteName, sensor: sensorName, mission: missionName, status: 'error', message: error.message
+        });
+    errorCount++;
+}
+}
+
+// Switch to step 3 - results
+document.getElementById('importStep2')?.classList.add('hidden');
+document.getElementById('importStep3')?.classList.remove('hidden');
+
+// Update stats
+document.getElementById('statSuccess').textContent=successCount;
+document.getElementById('statSkip').textContent=skipCount;
+document.getElementById('statError').textContent=errorCount;
+
+// Show results table
+const resultsBody=document.getElementById('resultsBody');
+
+if (resultsBody) {
+    resultsBody.innerHTML=results.map(r=> ` <tr> <td>$ {
+            r.row
+        }
+
+        </td> <td>$ {
+            escapeHtml(r.satellite || '-')
+        }
+
+        </td> <td>$ {
+            escapeHtml(r.sensor || '-')
+        }
+
+        </td> <td>$ {
+            escapeHtml(r.mission || '-')
+        }
+
+        </td> <td class="status-${r.status}" >$ {
+            r.status.toUpperCase()
+        }
+
+        </td> </tr> `).join('');
+}
+
+showAlert(`✅ Import complete: $ {
+        successCount
+    }
+
+    created, $ {
+        skipCount
+    }
+
+    skipped, $ {
+        errorCount
+    }
+
+    errors`, 'success');
+}
+
+// ============================================================
+// LINK MODAL FUNCTIONS
+// ============================================================
+
+async function openLinkModal() {
+    const modal=document.getElementById('linkModal');
+    if (modal) modal.classList.add('active');
+
+    // Load missions if not loaded
+    if (missionsData.length===0) {
+        await loadMissions();
+    }
+
+    // Populate satellite dropdown
+    const linkSatellite=document.getElementById('linkSatellite');
+
+    if (linkSatellite) {
+        linkSatellite.innerHTML='<option value="">-- Select Satellite --</option>' + data.satellites.map(s=> `<option value="${s.ID}" >$ {
+                escapeHtml(s.name)
+            }
+
+            ($ {
+                    s.norad_id
+                })</option>`).join('');
+    }
+
+    // Populate sensor dropdown
+    const linkSensor=document.getElementById('linkSensor');
+
+    if (linkSensor) {
+        linkSensor.innerHTML='<option value="">-- Select Sensor --</option>' + data.sensors.map(s=> `<option value="${s.sensor_id}" >$ {
+                escapeHtml(s.name)
+            }
+
+            </option>`).join('');
+    }
+
+    // Populate mission dropdown
+    const linkMission=document.getElementById('linkMission');
+
+    if (linkMission) {
+        linkMission.innerHTML='<option value="">-- Select Mission --</option>' + '<option value="__NEW__">+ Create New Mission...</option>' + missionsData.map(m=> `<option value="${m.id}" >$ {
+                escapeHtml(m.name)
+            }
+
+            </option>`).join('');
+    }
+
+    // Clear message
+    document.getElementById('linkMessage').innerHTML='';
+    document.getElementById('newMissionName').style.display='none';
+    document.getElementById('newMissionName').value='';
+    document.getElementById('linkNotes').value='';
+}
+
+function closeLinkModal() {
+    const modal=document.getElementById('linkModal');
+    if (modal) modal.classList.remove('active');
+
+    // Clear form
+    document.getElementById('linkSatellite').value='';
+    document.getElementById('linkSensor').value='';
+    document.getElementById('linkMission').value='';
+    document.getElementById('linkNotes').value='';
+    document.getElementById('newMissionName').value='';
+    document.getElementById('newMissionName').style.display='none';
+    document.getElementById('linkMessage').innerHTML='';
+}
+
+async function createLink() {
+    const satelliteId=parseInt(document.getElementById('linkSatellite')?.value);
+    const sensorId=parseInt(document.getElementById('linkSensor')?.value);
+    const missionValue=document.getElementById('linkMission')?.value;
+    const newMissionName=document.getElementById('newMissionName')?.value.trim();
+    const notes=document.getElementById('linkNotes')?.value.trim() || '';
+    const messageEl=document.getElementById('linkMessage');
+
+    // Validate
+    if ( !satelliteId) {
+        if (messageEl) messageEl.innerHTML='<span class="validation-error">Please select a satellite</span>';
+        return;
+    }
+
+    if ( !sensorId) {
+        if (messageEl) messageEl.innerHTML='<span class="validation-error">Please select a sensor</span>';
+        return;
+    }
+
+    if ( !missionValue) {
+        if (messageEl) messageEl.innerHTML='<span class="validation-error">Please select a mission</span>';
+        return;
+    }
+
+    if (missionValue==='__NEW__' && !newMissionName) {
+        if (messageEl) messageEl.innerHTML='<span class="validation-error">Please enter a mission name</span>';
+        return;
+    }
+
+    try {
+        let missionId;
+
+        if (missionValue==='__NEW__') {
+            // Create new mission
+            if (messageEl) messageEl.innerHTML='<span style="color: var(--color-text-secondary);">Creating mission...</span>';
+            missionId=await createMission(newMissionName);
+
+            missionsData.push({
+                id: missionId, name: newMissionName
+            });
+    }
+
+    else {
+        missionId=parseInt(missionValue);
+    }
+
+    // Check if junction exists
+    await loadJunctionTable();
+    const exists=await checkJunctionExists(satelliteId, sensorId, missionId);
+
+    if (exists) {
+        if (messageEl) messageEl.innerHTML='<span class="validation-error">This link already exists!</span>';
+        return;
+    }
+
+    // Create junction
+    if (messageEl) messageEl.innerHTML='<span style="color: var(--color-text-secondary);">Creating link...</span>';
+    await createJunctionRecord(satelliteId, sensorId, missionId, notes);
+
+    showAlert('✅ Link created successfully!', 'success');
+    closeLinkModal();
+
+    // Reload data to reflect changes
+    await loadJunctionTable();
+    buildSatelliteSensorLinksFromNames();
+    renderList();
+
+}
+
+catch (error) {
+    console.error('Error creating link:', error);
+
+    if (messageEl) messageEl.innerHTML=`<span class="validation-error" >Error: $ {
+        error.message
+    }
+
+    </span>`;
+    showAlert('❌ Failed to create link: ' + error.message, 'error');
+}
+}
+
+// ============================================================
 // UTILITIES
 // ============================================================
 
@@ -2396,5 +3182,5 @@ function showAlert(message, type='info') {
     setTimeout(()=> alert.remove(), 5000);
 }
 
-console.log('✅ Satellite Sensor Explorer v5.7.4 loaded and ready');
+console.log('✅ Satellite Sensor Explorer v5.8.1 loaded and ready');
 </script></body></html>
