@@ -952,7 +952,7 @@
         /**
          * SATELLITE SENSOR EXPLORER v5.9.1 - GLASSMORPHISM EDITION (FIXED)
          * Pure vanilla JavaScript - NO jQuery dependency
-         * FIX: Reverted sensor loading logic from v5.9.0
+         * FIX: Reverted sensor loading logic from v5.9.0 + fixed displayLinkedAssets function
          * Features: Junction table, CSV Import, Manual Linking
          */
 
@@ -1052,7 +1052,7 @@
             // ============================================================ 
 
             document.addEventListener('DOMContentLoaded', async () => {
-                console.log('🚀 Initializing Satellite Sensor Explorer v5.9.1 (Glassmorphism Edition)');
+                console.log('🚀 Initializing Satellite Sensor Explorer v5.9.1 (Glassmorphism Edition - FIXED)');
                 console.log('SharePoint Mode:', config.inSharePoint ? 'YES' : 'NO');
                 console.log('Site URL:', config.siteUrl || 'NONE (LOCAL MODE)');
 
@@ -1740,7 +1740,7 @@
             }
 
             // ============================================================
-            // LINKED ASSETS
+            // LINKED ASSETS (FIXED)
             // ============================================================
 
             function displayLinkedAssets() {
@@ -2272,6 +2272,7 @@
 
                 for (const row of csvData) {
                     try {
+                        // Check duplicate by NORAD_ID
                         const noradId = parseInt(row.norad_id);
                         const exists = data.satellites.some(s => s.norad_id === noradId);
 
@@ -2281,7 +2282,7 @@
                             continue;
                         }
 
-                        let newId = Date.now() + created;
+                        let newId = Date.now() + created; // Local fallback ID
 
                         if (config.inSharePoint && config.siteUrl) {
                             const result = await createSatelliteRecord(row);
@@ -2315,17 +2316,18 @@
 
                 for (const row of csvData) {
                     try {
+                        // Check duplicate by Name (case-insensitive)
                         const exists = data.sensors.some(s =>
                             s.name.toLowerCase() === row.name.toLowerCase()
                         );
 
                         if (exists) {
-                            console.log(`Sensor ${row.name} already exists, skipping`);
+                            console.log(`Sensor "${row.name}" already exists, skipping`);
                             skipped++;
                             continue;
                         }
 
-                        let newId = Date.now() + created;
+                        let newId = Date.now() + created; // Local fallback ID
 
                         if (config.inSharePoint && config.siteUrl) {
                             const result = await createSensorRecord(row);
@@ -2381,14 +2383,69 @@
                 return response.json();
             }
 
-            async function createSatelliteRecord(data) {
-                // Placeholder for SharePoint item creation
-                return { d: { ID: Date.now() } };
+            async function createSatelliteRecord(satData) {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.satelliteList}')/items`;
+
+                const requestDigest = await getRequestDigest();
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': requestDigest
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        '__metadata': { 'type': `SP.Data.${config.satelliteList.replace(/_/g, '_x005f_')}ListItem` },
+                        'Title': satData.name,
+                        'NORAD_ID': parseInt(satData.norad_id) || 0,
+                        'COSPAR_ID': satData.cospar_id || '',
+                        'Mission_Type': satData.mission || '',
+                        'Status': satData.status || 'Unknown',
+                        'Orbit_Type': satData.orbit_type || '',
+                        'Launch_Date': satData.launch_date || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to create satellite: HTTP ${response.status}`);
+                }
+
+                return response.json();
             }
 
-            async function createSensorRecord(data) {
-                // Placeholder for SharePoint item creation
-                return { d: { ID: Date.now() } };
+            async function createSensorRecord(sensorData) {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.sensorList}')/items`;
+
+                const requestDigest = await getRequestDigest();
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': requestDigest
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        '__metadata': { 'type': `SP.Data.${config.sensorList.replace(/_/g, '_x005f_')}ListItem` },
+                        'Title': sensorData.name,
+                        'Sensor_Type': sensorData.type || '',
+                        'Description': sensorData.description || '',
+                        'N_of_Bands': parseInt(sensorData.bands) || null,
+                        'Resolution_Min_m': parseInt(sensorData.resolution_min) || null,
+                        'Resolution_Max_m': parseInt(sensorData.resolution_max) || null,
+                        'Swath_Min_km': parseInt(sensorData.swath_min) || null,
+                        'Swath_Max_km': parseInt(sensorData.swath_max) || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to create sensor: HTTP ${response.status}`);
+                }
+
+                return response.json();
             }
 
             async function getRequestDigest() {
@@ -2406,43 +2463,82 @@
             // ============================================================
 
             function exportAvailableNames() {
-                const satelliteNames = data.satellites.map(s => s.name);
-                const sensorNames = data.sensors.map(s => s.name);
+                // Build CSV content with satellites and sensors
+                const satNames = data.satellites.map(s => s.name).sort();
+                const senNames = data.sensors.map(s => s.name).sort();
 
-                const csv = 'SATELLITES\n' +
-                    satelliteNames.join('\n') + '\n\n' +
-                    'SENSORS\n' +
-                    sensorNames.join('\n');
+                let csvContent = 'Available Satellite Names,Available Sensor Names\n';
+                const maxRows = Math.max(satNames.length, senNames.length);
 
-                const blob = new Blob([csv], { type: 'text/csv' });
+                for (let i = 0; i < maxRows; i++) {
+                    const sat = satNames[i] || '';
+                    const sen = senNames[i] || '';
+                    csvContent += `"${sat}","${sen}"\n`;
+                }
+
+                // Trigger download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'satellite_sensor_names.csv';
-                a.click();
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'available_names.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
                 URL.revokeObjectURL(url);
 
-                showAlert('Names exported successfully!', 'success');
+                showAlert(`Exported ${satNames.length} satellites and ${senNames.length} sensors`, 'success');
             }
+
+            // ============================================================
+            // LINK MODAL
+            // ============================================================
 
             function openLinkModal() {
                 const linkModal = DOM.byId('linkModal');
+                if (linkModal) DOM.addClass(linkModal, 'active');
+
+                // Populate dropdowns
+                populateLinkDropdowns();
+                setupLinkModalListeners();
+
+                // Clear status
+                const linkStatus = DOM.byId('linkStatus');
+                if (linkStatus) linkStatus.innerHTML = '';
+            }
+
+            function closeLinkModal() {
+                const linkModal = DOM.byId('linkModal');
+                if (linkModal) DOM.removeClass(linkModal, 'active');
+
+                const linkSatellite = DOM.byId('link-satellite');
+                const linkSensor = DOM.byId('link-sensor');
+                const linkNotes = DOM.byId('link-notes');
+
+                if (linkSatellite) linkSatellite.value = '';
+                if (linkSensor) linkSensor.value = '';
+                if (linkNotes) linkNotes.value = '';
+            }
+
+            function populateLinkDropdowns() {
                 const linkSatellite = DOM.byId('link-satellite');
                 const linkSensor = DOM.byId('link-sensor');
 
-                if (linkModal) DOM.addClass(linkModal, 'active');
-
                 if (linkSatellite) {
                     linkSatellite.innerHTML = '<option value="">-- Select Satellite --</option>' +
-                        data.satellites.map(s => `<option value="${s.ID}:${s.norad_id}">${escapeHtml(s.name)}</option>`).join('');
+                        data.satellites
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(s => `<option value="${s.ID}">${escapeHtml(s.name)} (${s.norad_id})</option>`)
+                            .join('');
                 }
 
                 if (linkSensor) {
                     linkSensor.innerHTML = '<option value="">-- Select Sensor --</option>' +
-                        data.sensors.map(s => `<option value="${s.sensor_id}">${escapeHtml(s.name)}</option>`).join('');
+                        data.sensors
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(s => `<option value="${s.sensor_id}">${escapeHtml(s.name)}</option>`)
+                            .join('');
                 }
-
-                setupLinkModalListeners();
             }
 
             function setupLinkModalListeners() {
@@ -2461,81 +2557,82 @@
                 }
             }
 
-            function closeLinkModal() {
-                const linkModal = DOM.byId('linkModal');
-                const linkSatellite = DOM.byId('link-satellite');
-                const linkSensor = DOM.byId('link-sensor');
-                const linkNotes = DOM.byId('link-notes');
+            async function createLink() {
+                const satelliteId = parseInt(DOM.byId('link-satellite')?.value);
+                const sensorId = parseInt(DOM.byId('link-sensor')?.value);
                 const linkStatus = DOM.byId('linkStatus');
 
-                if (linkModal) DOM.removeClass(linkModal, 'active');
-                if (linkSatellite) linkSatellite.value = '';
-                if (linkSensor) linkSensor.value = '';
-                if (linkNotes) linkNotes.value = '';
-                if (linkStatus) linkStatus.innerHTML = '';
-            }
-
-            function createLink() {
-                const linkSatellite = DOM.byId('link-satellite');
-                const linkSensor = DOM.byId('link-sensor');
-                const linkStatus = DOM.byId('linkStatus');
-
-                if (!linkSatellite || !linkSensor) return;
-
-                const [satId, noradId] = (linkSatellite.value || '').split(':');
-                const sensorId = linkSensor.value;
-
-                if (!satId || !sensorId) {
-                    if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-error);">❌ Please select both satellite and sensor</span>';
+                if (!satelliteId || !sensorId) {
+                    if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-error);">Please select both satellite and sensor</span>';
                     return;
                 }
 
-                const noradIdNum = parseInt(noradId);
+                const sat = data.satellites.find(s => s.ID === satelliteId);
+                const sensor = data.sensors.find(s => s.sensor_id === sensorId);
 
+                if (!sat || !sensor) {
+                    if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-error);">Invalid selection</span>';
+                    return;
+                }
+
+                // Check if link already exists
                 const exists = data.satellite_sensor_links.some(link =>
-                    link.norad_id === noradIdNum && link.sensor_id === parseInt(sensorId)
+                    link.norad_id === sat.norad_id && link.sensor_id === sensorId
                 );
 
                 if (exists) {
-                    if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-warning);">⚠️ This link already exists</span>';
+                    if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-warning);">This link already exists</span>';
                     return;
                 }
 
-                data.satellite_sensor_links.push({
-                    norad_id: noradIdNum,
-                    sensor_id: parseInt(sensorId)
-                });
+                if (linkStatus) linkStatus.innerHTML = '<span class="loading"></span> Creating link...';
 
-                if (linkStatus) linkStatus.innerHTML = '<span style="color: var(--color-success);">✅ Link created successfully!</span>';
+                try {
+                    if (config.inSharePoint && config.siteUrl) {
+                        await createJunctionRecord(satelliteId, sensorId);
+                    }
 
-                setTimeout(() => {
+                    // Add to local data
+                    data.satellite_sensor_links.push({
+                        norad_id: sat.norad_id,
+                        sensor_id: sensorId,
+                        satellite_name: sat.name,
+                        sensor_name: sensor.name
+                    });
+
                     closeLinkModal();
                     renderList();
-                    if (selectedItem) displayLinkedAssets();
-                }, 1000);
+                    showAlert(`Link created: ${sat.name} ↔ ${sensor.name}`, 'success');
+                } catch (err) {
+                    console.error('Create link error:', err);
+                    if (linkStatus) linkStatus.innerHTML = `<span style="color: var(--color-error);">Error: ${err.message}</span>`;
+                }
             }
 
+            // ============================================================
+            // UTILITIES
+            // ============================================================
+
             function escapeHtml(text) {
+                if (!text) return '';
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
 
             function showAlert(message, type = 'info') {
-                const alertContainer = DOM.byId('alertContainer');
-                if (!alertContainer) return;
+                const container = DOM.byId('alertContainer');
+                if (!container) return;
 
-                const alert = document.createElement('div');
-                alert.className = `alert alert-${type}`;
-                alert.textContent = message;
-
-                alertContainer.appendChild(alert);
-
-                setTimeout(() => {
-                    alert.style.animation = 'slideIn 0.3s var(--transition-smooth) reverse';
-                    setTimeout(() => alert.remove(), 300);
-                }, 3000);
+                const alert = DOM.create('div', {
+                    class: `alert alert-${type}`,
+                    text: message
+                });
+                container.appendChild(alert);
+                setTimeout(() => alert.remove(), 5000);
             }
+
+            console.log('✅ Satellite Sensor Explorer v5.9.1 (Vanilla JS - Glassmorphism FIXED) loaded and ready');
         })();
     </script>
 </body>
