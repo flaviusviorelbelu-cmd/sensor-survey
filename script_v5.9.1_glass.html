@@ -950,9 +950,9 @@
 
     <script>
         /**
-         * SATELLITE SENSOR EXPLORER v5.9.1 - GLASSMORPHISM EDITION
+         * SATELLITE SENSOR EXPLORER v5.9.1 - GLASSMORPHISM EDITION (FIXED)
          * Pure vanilla JavaScript - NO jQuery dependency
-         * Improved Design: Modern glass effects, better layout, renamed relationships to "Linked Assets"
+         * FIX: Reverted sensor loading logic from v5.9.0
          * Features: Junction table, CSV Import, Manual Linking
          */
 
@@ -1076,6 +1076,7 @@
                         await loadSatellites();
                         console.log('✅ Satellites loaded');
                         await loadSensors();
+                        // loadSensors errors are caught internally - continues even if fails
                         console.log('✅ Sensors load attempt completed');
                         await loadSatelliteSensorLinks();
                         console.log('✅ Links loaded');
@@ -1255,6 +1256,7 @@
                     console.error('❌ Error loading sensors:', error.message);
                     console.warn('⚠️  Sensor list issue - app will continue with satellites only');
                     data.sensors = [];
+                    // DON'T throw - let app continue
                 }
             }
 
@@ -1266,6 +1268,8 @@
                 }
 
                 try {
+                    // Load from Satellite_Sensor junction list using lookup columns
+                    // The list has Satellite (lookup to Satellite_Fixed) and Sensor (lookup to Sensor)
                     const url = config.siteUrl +
                         `/_api/web/lists/getbytitle('${config.junctionList}')/items?$select=ID,SatelliteId,SensorId,Satellite/Title,Satellite/NORAD_ID,Sensor/Title&$expand=Satellite,Sensor&$top=5000`;
 
@@ -1280,7 +1284,9 @@
                     if (response.ok) {
                         const result = await response.json();
                         data.satellite_sensor_links = (result?.d?.results ?? []).map(item => {
+                            // Get NORAD_ID from expanded Satellite lookup
                             const noradId = item.Satellite?.NORAD_ID || null;
+                            // Get Sensor ID from the lookup ID
                             const sensorId = item.SensorId || null;
 
                             return {
@@ -2348,6 +2354,33 @@
                 return { created, skipped, errors };
             }
 
+            async function createJunctionRecord(satelliteId, sensorId) {
+                const url = config.siteUrl + `/_api/web/lists/getbytitle('${config.junctionList}')/items`;
+
+                const requestDigest = await getRequestDigest();
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': requestDigest
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        '__metadata': { 'type': `SP.Data.${config.junctionList.replace(/_/g, '_x005f_')}ListItem` },
+                        'SatelliteId': satelliteId,
+                        'SensorId': sensorId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to create junction record: HTTP ${response.status}`);
+                }
+
+                return response.json();
+            }
+
             async function createSatelliteRecord(data) {
                 // Placeholder for SharePoint item creation
                 return { d: { ID: Date.now() } };
@@ -2358,13 +2391,18 @@
                 return { d: { ID: Date.now() } };
             }
 
-            async function createJunctionRecord(satelliteId, sensorId) {
-                // Placeholder for SharePoint junction record creation
-                return { d: { ID: Date.now() } };
+            async function getRequestDigest() {
+                const digestResponse = await fetch(config.siteUrl + '/_api/contextinfo', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json;odata=verbose' },
+                    credentials: 'include'
+                });
+                const digestResult = await digestResponse.json();
+                return digestResult?.d?.GetContextWebInformation?.FormDigestValue;
             }
 
             // ============================================================
-            // EXPORT & UTILITIES
+            // EXPORT NAMES
             // ============================================================
 
             function exportAvailableNames() {
