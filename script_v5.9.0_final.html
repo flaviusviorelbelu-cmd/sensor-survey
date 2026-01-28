@@ -727,10 +727,6 @@
                     <label for="sat-launch">Launch Date</label>
                     <input type="date" id="sat-launch">
                 </div>
-                <div class="form-group">
-                    <label for="sat-sensors">Sensor Names (comma-separated)</label>
-                    <textarea id="sat-sensors" placeholder="e.g., AIRS, AMSR-E"></textarea>
-                </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-primary" id="saveSatelliteBtn">Save</button>
                     <button type="button" class="btn btn-secondary" id="cancelSatelliteBtn">Cancel</button>
@@ -961,8 +957,7 @@
                                 mission: 'METOC',
                                 orbit_type: 'SSO',
                                 launch_date: '2002-05-04',
-                                constellation_id: '',
-                                sensor_names: 'AIRS, AMSR-E'
+                                constellation_id: ''
                             },
                             {
                                 ID: 2,
@@ -973,8 +968,7 @@
                                 mission: 'METOC',
                                 orbit_type: 'SSO',
                                 launch_date: '1999-12-18',
-                                constellation_id: '',
-                                sensor_names: 'ASTER'
+                                constellation_id: ''
                             }
                         ];
 
@@ -1046,7 +1040,7 @@
 
                 try {
                     const url = config.siteUrl +
-                        `/_api/web/lists/getbytitle('${config.satelliteList}')/items?$select=ID,Title,NORAD_ID,COSPAR_ID,Mission_Type,Status,Orbit_Type,Launch_Date,Constellation_ID,Sensor_Names&$top=5000`;
+                        `/_api/web/lists/getbytitle('${config.satelliteList}')/items?$select=ID,Title,NORAD_ID,COSPAR_ID,Mission_Type,Status,Orbit_Type,Launch_Date,Constellation_ID&$top=5000`;
 
                     const response = await fetch(url, {
                         method: 'GET',
@@ -1068,8 +1062,7 @@
                         mission: item.Mission_Type || '',
                         orbit_type: item.Orbit_Type || '',
                         launch_date: item.Launch_Date ? new Date(item.Launch_Date).toISOString().split('T')[0] : '',
-                        constellation_id: item.Constellation_ID || '',
-                        sensor_names: item.Sensor_Names || ''
+                        constellation_id: item.Constellation_ID || ''
                     }));
 
                     console.log(`✅ Loaded ${data.satellites.length} satellites from SharePoint`);
@@ -1773,8 +1766,7 @@
                         'sat-mission': sat.mission || '',
                         'sat-status': sat.status || 'Operational',
                         'sat-orbit': sat.orbit_type || '',
-                        'sat-launch': sat.launch_date || '',
-                        'sat-sensors': sat.sensor_names || ''
+                        'sat-launch': sat.launch_date || ''
                     };
 
                     Object.entries(fields).forEach(([id, value]) => {
@@ -1801,8 +1793,7 @@
                     mission: (DOM.byId('sat-mission')?.value || '').trim(),
                     status: DOM.byId('sat-status')?.value || 'Operational',
                     orbit_type: DOM.byId('sat-orbit')?.value || '',
-                    launch_date: DOM.byId('sat-launch')?.value || '',
-                    sensor_names: (DOM.byId('sat-sensors')?.value || '').trim()
+                    launch_date: DOM.byId('sat-launch')?.value || ''
                 };
 
                 let hasError = false;
@@ -2169,8 +2160,7 @@
                             mission: row.mission,
                             status: row.status,
                             orbit_type: row.orbit_type,
-                            launch_date: row.launch_date,
-                            sensor_names: ''
+                            launch_date: row.launch_date
                         });
 
                         created++;
