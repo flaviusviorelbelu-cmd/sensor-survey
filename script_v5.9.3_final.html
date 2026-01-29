@@ -2374,10 +2374,13 @@
 
             const CSV_FORMATS = {
                 links: {
-                    columns: 'SatelliteName,SensorName',
-                    example: 'AQUA,AIRS',
-                    parse: (parts) => ({ satellite: parts[0], sensor: parts[1] }),
-                    validate: (row) => row.satellite && row.sensor
+                    columns: 'NORAD_ID,SensorName',
+                    example: '27424,AIRS',
+                    parse: (parts) => ({ 
+                        norad_id: parts[0]?.trim() || '', 
+                        sensor: parts[1]?.trim() || '' 
+                    }),
+                    validate: (row) => row.norad_id && /^\d+$/.test(row.norad_id) && row.sensor
                 },
                 satellites: {
                     columns: 'Name,NORAD_ID,COSPAR_ID,Mission,Status,OrbitType,LaunchDate',
@@ -2535,7 +2538,7 @@
                     if (csvPreview) {
                         csvPreview.innerHTML = csvData.slice(0, 5).map(row => {
                             if (currentImportType === 'links') {
-                                return `<div>${escapeHtml(row.satellite)} → ${escapeHtml(row.sensor)}</div>`;
+                                return `<div>${escapeHtml(row.norad_id)} → ${escapeHtml(row.sensor)}</div>`;
                             } else if (currentImportType === 'satellites') {
                                 return `<div>🛰️ ${escapeHtml(row.name)} (NORAD: ${escapeHtml(row.norad_id)})</div>`;
                             } else {
@@ -2592,14 +2595,14 @@
                 for (const row of csvData) {
                     try {
                         const sat = data.satellites.find(s =>
-                            s.name.toLowerCase() === row.satellite.toLowerCase()
+                            String(s.norad_id) === String(row.norad_id)
                         );
                         const sensor = data.sensors.find(s =>
-                            s.name.toLowerCase() === row.sensor.toLowerCase()
+                            s.name.trim().toLowerCase() === row.sensor.toLowerCase()
                         );
 
                         if (!sat) {
-                            console.warn(`Satellite not found: ${row.satellite}`);
+                            console.warn(`Satellite not found with NORAD_ID: ${row.norad_id}`);
                             errors++;
                             continue;
                         }
