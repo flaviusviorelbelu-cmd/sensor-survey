@@ -2374,10 +2374,10 @@
 
             const CSV_FORMATS = {
                 links: {
-                    columns: 'SatelliteName,SensorName',
-                    example: 'AQUA,AIRS',
-                    parse: (parts) => ({ satellite: parts[0], sensor: parts[1] }),
-                    validate: (row) => row.satellite && row.sensor
+                    columns: 'NORAD_ID,SensorName',
+                    example: '27424,AIRS',
+                    parse: (parts) => ({ norad_id: parts[0], sensor: parts[1] }),
+                    validate: (row) => row.norad_id && row.sensor
                 },
                 satellites: {
                     columns: 'Name,NORAD_ID,COSPAR_ID,Mission,Status,OrbitType,LaunchDate',
@@ -2592,14 +2592,14 @@
                 for (const row of csvData) {
                     try {
                         const sat = data.satellites.find(s =>
-                            s.name.toLowerCase() === row.satellite.toLowerCase()
+                            String(s.norad_id) === String(row.norad_id).trim()
                         );
                         const sensor = data.sensors.find(s =>
                             s.name.toLowerCase() === row.sensor.toLowerCase()
                         );
 
                         if (!sat) {
-                            console.warn(`Satellite not found: ${row.satellite}`);
+                            console.warn(`Satellite not found with NORAD_ID: ${row.norad_id}`);
                             errors++;
                             continue;
                         }
